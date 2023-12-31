@@ -20,9 +20,18 @@ document.getElementById('submit-button').addEventListener('click', function()
         }
         */
         var fileInput = document.getElementById('formFile');
-        PrintLevelData(fileInput);
+        console.log(isValid[1]);
+        if(isValid[1] === 'level')
+        {
+            GenerateLevelTable(fileInput);
+        }
+        else if(isValid[1] === 'record')
+        {
+            //implementar mais tarde
+        }
     }).catch(error => 
     {
+        console.error(error);
         submitButton.textContent = 'Arquivo Inválido ❌';
     });
 });
@@ -40,13 +49,11 @@ function VerificaArquivoValido(file)
                 var obj = JSON.parse(reader.result);
                 if(obj.TipoData == "level")
                 {
-                    console.log("level");
-                    resolve(true);
+                    resolve([true, 'level']); //array porque o resolve só aceita um parâmetro
                 }
                 else if(obj.TipoData == "record")
                 {
-                    console.log("record");
-                    resolve(true);
+                    resolve([true, 'record']); //array porque o resolve só aceita um parâmetro
                 }
                 else
                 {
