@@ -12,6 +12,15 @@ document.getElementById('submit-button').addEventListener('click', function()
     VerificaArquivoValido(file).then(isValid => 
     {
         submitButton.textContent = 'Enviado ✅';
+        /*
+        var parent = document.getElementById('form-container');
+        while(parent.firstChild) 
+        {
+            parent.removeChild(parent.firstChild);
+        }
+        */
+        var fileInput = document.getElementById('formFile');
+        PrintLevelData(fileInput);
     }).catch(error => 
     {
         submitButton.textContent = 'Arquivo Inválido ❌';
