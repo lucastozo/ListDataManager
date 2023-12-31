@@ -141,5 +141,6 @@ function DeletarLinhaTabela(table, rowIndex) {
                         "\n\nEXCLUIR?";
     if(confirm(confirmMessage)) {
         table.deleteRow(rowIndex);
+        //atualizar posições dos levels restantes
     }
 }
