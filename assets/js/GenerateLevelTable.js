@@ -179,9 +179,8 @@ function BotoesManipuladores()
         var video = document.querySelector('#level-video').value;
         var publisher = document.querySelector('#level-publisher').value;
         var listpct = document.querySelector('#level-listpct').value;
-
-        //as variáveis acima estão sendo preenchidas corretamente
-        //implementar mais tarde: verificar se os campos estão preenchidos; adicionar o level na tabela
+        //console.log(position, name, creator, verifier, video, publisher, listpct);
+        AdicionarLevel(position, name, creator, verifier, video, publisher, listpct);
     }
 
     var exportButton = document.createElement('button');
@@ -197,9 +196,108 @@ function BotoesManipuladores()
 
 }
 
-function AdicionarLevel()
+function AdicionarLevel(position, name, creator, verifier, video, publisher, listpct)
 {
+    //validar se os campos foram preenchidos
+    if(position === '' || name === '' || creator === '' || verifier === '' || video === '')
+    {
+        alert('Preencha todos os campos!');
+        return;
+    }
 
+    var table = document.querySelector('#level-table');
+    //abrir espaço na tabela para inserir a nova linha
+    for(var i = table.rows.length - 1; i >= position; i--)
+    {
+        var row = table.rows[i];
+        var currentPosition = parseInt(row.cells[0].textContent);
+        if(currentPosition >= position)
+        {
+            row.cells[0].textContent = currentPosition + 1;
+        }
+    }
+    var rowIndex = parseInt(position);
+
+    var newRow = table.insertRow(rowIndex);
+    var positionCell = newRow.insertCell();
+    positionCell.textContent = position;
+    var nameCell = newRow.insertCell();
+    nameCell.textContent = name;
+    var creatorCell = newRow.insertCell();
+    creatorCell.textContent = creator;
+    var verifierCell = newRow.insertCell();
+    verifierCell.textContent = verifier;
+    var videoCell = newRow.insertCell();
+    videoCell.textContent = video;
+    var publisherCell = newRow.insertCell();
+    publisherCell.textContent = publisher;
+    var listpctCell = newRow.insertCell();
+    listpctCell.textContent = listpct;
+    var actionsCell = newRow.insertCell();
+    actionsCell.style.textAlign = 'center';
+
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteButton.className = 'btn btn-danger';
+    deleteButton.style.margin = '5px';
+    deleteButton.onclick = function() {
+        DeletarLinhaTabela(table, newRow.rowIndex);
+    }
+    actionsCell.appendChild(deleteButton);
+
+    var downButton = document.createElement('button');
+    downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+    downButton.className = 'btn btn-dark';
+    downButton.style.margin = '5px';
+    downButton.style.borderColor = '#6a767f';
+    downButton.onclick = function() {
+        if(newRow.rowIndex < table.rows.length - 1)
+        {
+            var linhaPosterior = table.rows[newRow.rowIndex + 1];
+            var linhaAtual = table.rows[newRow.rowIndex];
+            var posicaoPosterior = linhaPosterior.cells[0].textContent;
+            var posicaoAtual = linhaAtual.cells[0].textContent;
+            linhaPosterior.cells[0].textContent = posicaoAtual;
+            linhaAtual.cells[0].textContent = posicaoPosterior;
+            table.insertBefore(linhaAtual, linhaPosterior);
+            table.insertBefore(linhaPosterior, linhaAtual);
+        }
+    }
+    actionsCell.appendChild(downButton);
+
+    var upButton = document.createElement('button');
+    upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    upButton.className = 'btn btn-dark';
+    upButton.style.margin = '5px';
+    upButton.style.borderColor = '#6a767f';
+    upButton.onclick = function() {
+        if(newRow.rowIndex > 1)
+        {
+            var linhaAnterior = table.rows[newRow.rowIndex - 1];
+            var linhaAtual = table.rows[newRow.rowIndex];
+            var posicaoAnterior = linhaAnterior.cells[0].textContent;
+            var posicaoAtual = linhaAtual.cells[0].textContent;
+            linhaAnterior.cells[0].textContent = posicaoAtual;
+            linhaAtual.cells[0].textContent = posicaoAnterior;
+            table.insertBefore(linhaAnterior, linhaAtual);
+            table.insertBefore(linhaAtual, linhaAnterior);
+        }
+    }
+    actionsCell.appendChild(upButton);
+
+    //limpar campos modal
+    document.querySelector('#level-position').value = '';
+    document.querySelector('#level-name').value = '';
+    document.querySelector('#level-creator').value = '';
+    document.querySelector('#level-verifier').value = '';
+    document.querySelector('#level-video').value = '';
+    document.querySelector('#level-publisher').value = '';
+    document.querySelector('#level-listpct').value = '';
+
+    //fechar modal
+    var modal = document.querySelector('#addLevel-modal');
+    var modalBS = bootstrap.Modal.getInstance(modal);
+    modalBS.hide();
 }
 
 //exportar tabela para json
