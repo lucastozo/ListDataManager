@@ -47,7 +47,6 @@ function GenerateLevelTable(fileInput) {
                     a.href = item[key];
                     a.textContent = item[key];
                     a.target = '_blank';
-                    a.style.cursor = 'pointer';
                     td.appendChild(a);
                 } else {
                     td.textContent = item[key];
@@ -94,13 +93,10 @@ function GenerateLevelTable(fileInput) {
                 if(tr.rowIndex < table.rows.length - 1)
                 {
                     var linhaPosterior = table.rows[tr.rowIndex + 1];
-                    var linhaAtual = table.rows[tr.rowIndex];
                     var posicaoPosterior = linhaPosterior.cells[0].textContent;
-                    var posicaoAtual = linhaAtual.cells[0].textContent;
-                    linhaPosterior.cells[0].textContent = posicaoAtual;
-                    linhaAtual.cells[0].textContent = posicaoPosterior;
-                    tbody.insertBefore(linhaAtual, linhaPosterior);
-                    tbody.insertBefore(linhaPosterior, linhaAtual);
+                    linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
+                    tr.cells[0].textContent = posicaoPosterior;
+                    table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
                 }
             }
             td.appendChild(downButton);
@@ -114,13 +110,10 @@ function GenerateLevelTable(fileInput) {
                 if(tr.rowIndex > 1)
                 {
                     var linhaAnterior = table.rows[tr.rowIndex - 1];
-                    var linhaAtual = table.rows[tr.rowIndex];
                     var posicaoAnterior = linhaAnterior.cells[0].textContent;
-                    var posicaoAtual = linhaAtual.cells[0].textContent;
-                    linhaAnterior.cells[0].textContent = posicaoAtual;
-                    linhaAtual.cells[0].textContent = posicaoAnterior;
-                    tbody.insertBefore(linhaAnterior, linhaAtual);
-                    tbody.insertBefore(linhaAtual, linhaAnterior);
+                    linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
+                    tr.cells[0].textContent = posicaoAnterior;
+                    table.tBodies[0].insertBefore(tr, linhaAnterior);
                 }
             }
             td.appendChild(upButton);
@@ -179,7 +172,6 @@ function BotoesManipuladores()
         var video = document.querySelector('#level-video').value;
         var publisher = document.querySelector('#level-publisher').value;
         var listpct = document.querySelector('#level-listpct').value;
-        //console.log(position, name, creator, verifier, video, publisher, listpct);
         AdicionarLevel(position, name, creator, verifier, video, publisher, listpct);
     }
 
@@ -198,15 +190,17 @@ function BotoesManipuladores()
 
 function AdicionarLevel(position, name, creator, verifier, video, publisher, listpct)
 {
-    //validar se os campos foram preenchidos
     if(position === '' || name === '' || creator === '' || verifier === '' || video === '')
     {
         alert('Preencha todos os campos!');
         return;
     }
-
+    else if(position < 1 || position > document.querySelector('#level-table').rows.length)
+    {
+        alert('Posição inválida. Insira um valor entre 1 e ' + document.querySelector('#level-table').rows.length + '.');
+        return;
+    }
     var table = document.querySelector('#level-table');
-    //abrir espaço na tabela para inserir a nova linha
     for(var i = table.rows.length - 1; i >= position; i--)
     {
         var row = table.rows[i];
@@ -219,22 +213,41 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     var rowIndex = parseInt(position);
 
     var newRow = table.insertRow(rowIndex);
+    newRow.spellcheck = false;
     var positionCell = newRow.insertCell();
     positionCell.textContent = position;
     var nameCell = newRow.insertCell();
     nameCell.textContent = name;
+    nameCell.contentEditable = true;
     var creatorCell = newRow.insertCell();
     creatorCell.textContent = creator;
+    creatorCell.contentEditable = true;
     var verifierCell = newRow.insertCell();
     verifierCell.textContent = verifier;
+    verifierCell.contentEditable = true;
     var videoCell = newRow.insertCell();
-    videoCell.textContent = video;
+    //colocar o texto como link
+    if(video)
+    {
+        var a = document.createElement('a');
+        a.href = video;
+        a.textContent = video;
+        a.target = '_blank';
+        a.style.cursor = 'pointer';
+        videoCell.appendChild(a);
+    }
+    else
+    {
+        videoCell.textContent = video;
+    }
+    videoCell.contentEditable = true;
     var publisherCell = newRow.insertCell();
     publisherCell.textContent = publisher;
+    publisherCell.contentEditable = true;
     var listpctCell = newRow.insertCell();
     listpctCell.textContent = listpct;
+    listpctCell.contentEditable = true;
     var actionsCell = newRow.insertCell();
-    actionsCell.style.textAlign = 'center';
 
     var deleteButton = document.createElement('button');
     deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
@@ -254,13 +267,10 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
         if(newRow.rowIndex < table.rows.length - 1)
         {
             var linhaPosterior = table.rows[newRow.rowIndex + 1];
-            var linhaAtual = table.rows[newRow.rowIndex];
             var posicaoPosterior = linhaPosterior.cells[0].textContent;
-            var posicaoAtual = linhaAtual.cells[0].textContent;
-            linhaPosterior.cells[0].textContent = posicaoAtual;
-            linhaAtual.cells[0].textContent = posicaoPosterior;
-            table.insertBefore(linhaAtual, linhaPosterior);
-            table.insertBefore(linhaPosterior, linhaAtual);
+            linhaPosterior.cells[0].textContent = newRow.cells[0].textContent;
+            newRow.cells[0].textContent = posicaoPosterior;
+            table.tBodies[0].insertBefore(newRow, linhaPosterior.nextSibling);
         }
     }
     actionsCell.appendChild(downButton);
@@ -274,18 +284,14 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
         if(newRow.rowIndex > 1)
         {
             var linhaAnterior = table.rows[newRow.rowIndex - 1];
-            var linhaAtual = table.rows[newRow.rowIndex];
             var posicaoAnterior = linhaAnterior.cells[0].textContent;
-            var posicaoAtual = linhaAtual.cells[0].textContent;
-            linhaAnterior.cells[0].textContent = posicaoAtual;
-            linhaAtual.cells[0].textContent = posicaoAnterior;
-            table.insertBefore(linhaAnterior, linhaAtual);
-            table.insertBefore(linhaAtual, linhaAnterior);
+            linhaAnterior.cells[0].textContent = newRow.cells[0].textContent;
+            newRow.cells[0].textContent = posicaoAnterior;
+            table.tBodies[0].insertBefore(newRow, linhaAnterior);
         }
     }
     actionsCell.appendChild(upButton);
 
-    //limpar campos modal
     document.querySelector('#level-position').value = '';
     document.querySelector('#level-name').value = '';
     document.querySelector('#level-creator').value = '';
@@ -294,7 +300,6 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     document.querySelector('#level-publisher').value = '';
     document.querySelector('#level-listpct').value = '';
 
-    //fechar modal
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
     modalBS.hide();
@@ -303,10 +308,9 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
 //exportar tabela para json
 function ExportarTabela(table)
 {
-    //adicionar linha "GeradoEm": "16/12/2023 00:09:49",
     var date = new Date();
     var day = date.getDate();
-    var month = date.getMonth() + 1; //January is 0!
+    var month = date.getMonth() + 1; //January is 0
     var year = date.getFullYear();
     var hour = date.getHours();
     var minute = date.getMinutes();

@@ -18,6 +18,11 @@ document.getElementById('submit-button').addEventListener('click', function()
         {
             parent.removeChild(parent.firstChild);
         }
+        var footer = document.getElementById('footer');
+        if(footer)
+        {
+            footer.remove();
+        }
 
         console.log(isValid[1]);
         if(isValid[1] === 'level')
