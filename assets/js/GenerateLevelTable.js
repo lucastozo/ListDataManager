@@ -1,3 +1,9 @@
+function IniciarLevelData(fileInput)
+{
+    BotoesManipuladores();
+    GenerateLevelTable(fileInput);
+}
+
 function GenerateLevelTable(fileInput) {
     var file = fileInput.files[0];
     var reader = new FileReader();
@@ -8,9 +14,9 @@ function GenerateLevelTable(fileInput) {
             return a.position_lvl - b.position_lvl;
         });
 
-        // Criar uma tabela com todos os elementos do arquivo json
         var table = document.createElement('table');
-        table.className = 'table table-striped';
+        table.className = 'table table-striped table-hover align-middle';
+        table.id = 'level-table';
 
         var thead = document.createElement('thead');
         var tr = document.createElement('tr');
@@ -124,6 +130,9 @@ function GenerateLevelTable(fileInput) {
         });
         table.appendChild(tbody);
         document.body.appendChild(table);
+        //adicionar na div table-container
+        var tableContainer = document.getElementById('table-container');
+        tableContainer.appendChild(table);
     };
     reader.readAsText(file);
 }
@@ -141,6 +150,91 @@ function DeletarLinhaTabela(table, rowIndex) {
                         "\n\nEXCLUIR?";
     if(confirm(confirmMessage)) {
         table.deleteRow(rowIndex);
-        //atualizar posições dos levels restantes
+        //para cada linha onde posição é maior que a posição do level excluído, diminuir 1
+        for(var i = rowIndex; i < table.rows.length; i++)
+        {
+            table.rows[i].cells[0].textContent = i;
+        }
     }
+}
+
+function BotoesManipuladores()
+{
+    var addRemoveContainer = document.getElementById('botoes-manipuladores-container');
+    
+    var addButton = document.createElement('button');
+    addButton.textContent = 'Adicionar Level';
+    addButton.className = 'btn btn-success';
+    addButton.style.margin = '5px';
+    addButton.setAttribute('data-bs-toggle', 'modal');
+    addButton.setAttribute('data-bs-target', '#addLevel-modal');
+    addRemoveContainer.appendChild(addButton);
+
+    var addLevelButton  = document.querySelector('#addLevel');
+    addLevelButton.onclick = function() {
+        var position = document.querySelector('#level-position').value;
+        var name = document.querySelector('#level-name').value;
+        var creator = document.querySelector('#level-creator').value;
+        var verifier = document.querySelector('#level-verifier').value;
+        var video = document.querySelector('#level-video').value;
+        var publisher = document.querySelector('#level-publisher').value;
+        var listpct = document.querySelector('#level-listpct').value;
+
+        //as variáveis acima estão sendo preenchidas corretamente
+        //implementar mais tarde: verificar se os campos estão preenchidos; adicionar o level na tabela
+    }
+
+    var exportButton = document.createElement('button');
+    exportButton.textContent = 'Exportar Arquivo';
+    exportButton.className = 'btn btn-primary';
+    exportButton.style.margin = '5px';
+    exportButton.onclick = function() {
+        var table = document.getElementById('level-table');
+        var json = ExportarTabela(table);
+        downloadJSON(json);
+    }
+    addRemoveContainer.appendChild(exportButton);
+
+}
+
+function AdicionarLevel()
+{
+
+}
+
+//exportar tabela para json
+function ExportarTabela(table)
+{
+    //adicionar linha "GeradoEm": "16/12/2023 00:09:49",
+    var date = new Date();
+    var day = date.getDate();
+    var month = date.getMonth() + 1; //January is 0!
+    var year = date.getFullYear();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    var generatedAt = day + '/' + month + '/' + year + ' ' + hour + ':' + minute + ':' + second;
+    var json = {GeradoEm: generatedAt, TipoData: "level", Data: []};
+    for(var i = 1; i < table.rows.length; i++)
+    {
+        var level = {};
+        level.position_lvl = parseInt(table.rows[i].cells[0].textContent);
+        level.name_lvl = table.rows[i].cells[1].textContent;
+        level.creator_lvl = table.rows[i].cells[2].textContent;
+        level.verifier_lvl = table.rows[i].cells[3].textContent;
+        level.video_lvl = table.rows[i].cells[4].textContent;
+        level.publisher_lvl = table.rows[i].cells[5].textContent;
+        level.listpct_lvl = parseInt(table.rows[i].cells[6].textContent);
+        json.Data.push(level);
+    }
+    return json;
+}
+
+function downloadJSON(json)
+{
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
+    var dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "leveldata.json");
+    dlAnchorElem.click();
 }

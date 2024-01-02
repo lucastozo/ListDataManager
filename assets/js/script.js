@@ -12,18 +12,17 @@ document.getElementById('submit-button').addEventListener('click', function()
     VerificaArquivoValido(file).then(isValid => 
     {
         submitButton.textContent = 'Enviado ✅';
-        /*
         var parent = document.getElementById('form-container');
-        while(parent.firstChild) 
+        var fileInput = document.getElementById('formFile');
+        while(parent.firstChild)
         {
             parent.removeChild(parent.firstChild);
         }
-        */
-        var fileInput = document.getElementById('formFile');
+
         console.log(isValid[1]);
         if(isValid[1] === 'level')
         {
-            GenerateLevelTable(fileInput);
+            IniciarLevelData(fileInput);
         }
         else if(isValid[1] === 'record')
         {
