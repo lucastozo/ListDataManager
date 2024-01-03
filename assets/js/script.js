@@ -24,14 +24,14 @@ document.getElementById('submit-button').addEventListener('click', function()
             footer.remove();
         }
 
-        console.log(isValid[1]);
+        console.log('Tipo Data: ' + isValid[1]);
         if(isValid[1] === 'level')
         {
             IniciarLevelData(fileInput);
         }
         else if(isValid[1] === 'record')
         {
-            //implementar mais tarde
+            IniciarPlayerData(fileInput);
         }
     }).catch(error => 
     {

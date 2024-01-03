@@ -1,6 +1,6 @@
 function IniciarLevelData(fileInput)
 {
-    BotoesManipuladores();
+    BotoesManipuladoresLevel();
     GenerateLevelTable(fileInput);
 }
 
@@ -151,7 +151,7 @@ function DeletarLinhaTabela(table, rowIndex) {
     }
 }
 
-function BotoesManipuladores()
+function BotoesManipuladoresLevel()
 {
     var addRemoveContainer = document.getElementById('botoes-manipuladores-container');
     

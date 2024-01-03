@@ -33,7 +33,7 @@
             
         </div>
     </section>
-    <!-- Modal -->
+    <!-- level modal -->
     <div class="modal fade" id="addLevel-modal" tabindex="-1" aria-labelledby="addLevelLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -43,19 +43,19 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <input type="number" class="form-control" id="level-position" placeholder="Posição" required>
+                    <input type="number" class="form-control" id="level-position" placeholder="Posição">
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="level-name" placeholder="Nome" required>
+                    <input type="text" class="form-control" id="level-name" placeholder="Nome">
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="level-creator" placeholder="Criador" required>
+                    <input type="text" class="form-control" id="level-creator" placeholder="Criador">
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="level-verifier" placeholder="Verificador" required>
+                    <input type="text" class="form-control" id="level-verifier" placeholder="Verificador">
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="level-video" placeholder="Vídeo link" required>
+                    <input type="text" class="form-control" id="level-video" placeholder="Vídeo link">
                 </div>
                 <div class="mb-3">
                     <input type="text" class="form-control" id="level-publisher" placeholder="Publicador (vazio caso não se aplique)">
@@ -71,6 +71,35 @@
         </div>
         </div>
     </div>
+    <!-- record modal -->
+    <div class="modal fade" id="addRecord-modal" tabindex="-1" aria-labelledby="addRecordLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="addRecordLabel">Adicionar record</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="level" placeholder="Level">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="player-name" placeholder="Player">
+                </div>
+                <div class="mb-3">
+                    <input type="number" class="form-control" id="progress" placeholder="Progresso">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="video" placeholder="Vídeo link (vazio para progresso sem vídeo - cuidado!)">
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" id="addRecord" class="btn btn-success">Adicionar</button>
+            </div>
+        </div>
+        </div>
+    </div>
     <footer class="text-center text-lg-start" id="footer">
         <div class="text-center p-3" style="background-color: rgba(128, 128, 128, 0.05);">
           Tool made by yuuchouze
@@ -80,6 +109,7 @@
       </footer>
     <script src="assets/js/script.js"></script>
     <script src="assets/js/LevelData.js"></script>
+    <script src="assets/js/PlayerData.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
