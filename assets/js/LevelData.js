@@ -181,8 +181,8 @@ function BotoesManipuladoresLevel()
     exportButton.style.margin = '5px';
     exportButton.onclick = function() {
         var table = document.getElementById('level-table');
-        var json = ExportarTabela(table);
-        downloadJSON(json);
+        var json = ExportarLevel(table);
+        DownloadLevelJSON(json);
     }
     addRemoveContainer.appendChild(exportButton);
 
@@ -306,7 +306,7 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
 }
 
 //exportar tabela para json
-function ExportarTabela(table)
+function ExportarLevel(table)
 {
     var date = new Date();
     var day = date.getDate();
@@ -332,7 +332,7 @@ function ExportarTabela(table)
     return json;
 }
 
-function downloadJSON(json)
+function DownloadLevelJSON(json)
 {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
     var dlAnchorElem = document.createElement('a');

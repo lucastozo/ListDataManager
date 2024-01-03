@@ -140,8 +140,8 @@ function BotoesManipuladoresRecord()
     exportButton.style.margin = '5px';
     exportButton.onclick = function() {
         var table = document.getElementById('player-table');
-        var json = ExportarTabela(table);
-        downloadJSON(json);
+        var json = ExportarRecord(table);
+        DownloadRecordJSON(json);
     }
     addRemoveContainer.appendChild(exportButton);
 }
@@ -209,7 +209,7 @@ function AdicionarRecord(level, player, progress, video)
 }
 
 //exportar tabela para json
-function ExportarTabela(table)
+function ExportarRecord(table)
 {
     var date = new Date();
     var day = date.getDate();
@@ -232,7 +232,7 @@ function ExportarTabela(table)
     return json;
 }
 
-function downloadJSON(json)
+function DownloadRecordJSON(json)
 {
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
     var dlAnchorElem = document.createElement('a');
