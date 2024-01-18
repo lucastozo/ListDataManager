@@ -337,6 +337,6 @@ function DownloadLevelJSON(json)
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
     var dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "leveldata.json");
+    dlAnchorElem.setAttribute("download", "NEWleveldata.json");
     dlAnchorElem.click();
 }

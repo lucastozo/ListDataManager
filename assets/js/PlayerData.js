@@ -237,6 +237,6 @@ function DownloadRecordJSON(json)
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
     var dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "playerdata.json");
+    dlAnchorElem.setAttribute("download", "NEWplayerdata.json");
     dlAnchorElem.click();
 }
