@@ -80,6 +80,14 @@ function GeneratePlayerTable(fileInput) {
             var cloneButton = criarBotaoClonar(tr);
             td.appendChild(cloneButton);
 
+            // descer
+            var downButton = criarBotaoDescer(tr);
+            td.appendChild(downButton);
+
+            // subir
+            var upButton = criarBotaoSubir(tr);
+            td.appendChild(upButton);
+
             tr.appendChild(td);
             tbody.appendChild(tr);
         });
@@ -194,6 +202,14 @@ function AdicionarRecord(level, player, progress, video)
     var cloneButton = criarBotaoClonar(newRow);
     actionsCell.appendChild(cloneButton);
 
+    // descer
+    var downButton = criarBotaoDescer(newRow);
+    actionsCell.appendChild(downButton);
+
+    // subir
+    var upButton = criarBotaoSubir(newRow);
+    actionsCell.appendChild(upButton);
+
     document.querySelector('#level').value = '';
     document.querySelector('#player-name').value = '';
     document.querySelector('#progress').value = '';
@@ -232,9 +248,49 @@ function criarBotaoClonar(tr) {
         var clone = tr.cloneNode(true);
         clone.children[clone.children.length - 1].children[0].onclick = criarBotaoDeletar(clone).onclick;
         clone.children[clone.children.length - 1].children[1].onclick = criarBotaoClonar(clone).onclick;
+        clone.children[clone.children.length - 1].children[2].onclick = criarBotaoDescer(clone).onclick;
+        clone.children[clone.children.length - 1].children[3].onclick = criarBotaoSubir(clone).onclick;
         tr.parentNode.insertBefore(clone, tr.nextSibling);
     }
     return cloneButton;
+}
+function criarBotaoDescer(tr) {
+    var downButton = document.createElement('button');
+    downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+    downButton.className = 'btn btn-dark';
+    downButton.style.margin = '5px';
+    downButton.style.borderColor = '#6a767f';
+    //tooltip
+    downButton.setAttribute('data-bs-toggle', 'tooltip');
+    downButton.setAttribute('data-bs-placement', 'top');
+    downButton.setAttribute('title', 'Descer');
+    downButton.onclick = function() {
+        var next = tr.nextSibling;
+        if(next)
+        {
+            tr.parentNode.insertBefore(next, tr);
+        }
+    }
+    return downButton;
+}
+function criarBotaoSubir(tr) {
+    var upButton = document.createElement('button');
+    upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    upButton.className = 'btn btn-dark';
+    upButton.style.margin = '5px';
+    upButton.style.borderColor = '#6a767f';
+    //tooltip
+    upButton.setAttribute('data-bs-toggle', 'tooltip');
+    upButton.setAttribute('data-bs-placement', 'top');
+    upButton.setAttribute('title', 'Subir');
+    upButton.onclick = function() {
+        var previous = tr.previousSibling;
+        if(previous)
+        {
+            tr.parentNode.insertBefore(tr, previous);
+        }
+    }
+    return upButton;
 }
 
 //exportar tabela para json
