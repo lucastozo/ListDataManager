@@ -349,8 +349,16 @@ function ExportarLevel(table)
         level.creator_lvl = table.rows[i].cells[2].textContent;
         level.verifier_lvl = table.rows[i].cells[3].textContent;
         level.video_lvl = table.rows[i].cells[4].textContent;
-        level.publisher_lvl = table.rows[i].cells[5].textContent;
-        level.listpct_lvl = parseInt(table.rows[i].cells[6].textContent);
+        var publisher = table.rows[i].cells[5].textContent;
+        if(publisher && publisher.trim() !== '')
+        {
+            level.publisher_lvl = publisher;
+        }
+        var listpct = table.rows[i].cells[6].textContent;
+        if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100)
+        {
+            level.listpct_lvl = parseInt(listpct);
+        }
         json.Data.push(level);
     }
     return json;
