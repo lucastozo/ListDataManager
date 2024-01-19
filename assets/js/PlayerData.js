@@ -311,7 +311,11 @@ function ExportarRecord(table)
         record.level_name = table.rows[i].cells[1].textContent;
         record.player_name = table.rows[i].cells[2].textContent;
         record.progress = parseInt(table.rows[i].cells[3].textContent);
-        record.video = table.rows[i].cells[4].textContent;
+        var video = table.rows[i].cells[4].textContent;
+        if(video && video.trim() !== '')
+        {
+            record.video = video;
+        }
         json.Data.push(record);
     }
     return json;
