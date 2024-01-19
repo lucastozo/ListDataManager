@@ -79,6 +79,10 @@ function GenerateLevelTable(fileInput) {
             deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
             deleteButton.className = 'btn btn-danger';
             deleteButton.style.margin = '5px';
+            //tooltip
+            deleteButton.setAttribute('data-bs-toggle', 'tooltip');
+            deleteButton.setAttribute('data-bs-placement', 'top');
+            deleteButton.setAttribute('title', 'Deletar level');
             deleteButton.onclick = function() {
                 DeletarLinhaLevelTable(table, tr.rowIndex);
             }
@@ -89,6 +93,10 @@ function GenerateLevelTable(fileInput) {
             downButton.className = 'btn btn-dark';
             downButton.style.margin = '5px';
             downButton.style.borderColor = '#6a767f';
+            //tooltip
+            downButton.setAttribute('data-bs-toggle', 'tooltip');
+            downButton.setAttribute('data-bs-placement', 'top');
+            downButton.setAttribute('title', 'Diminuir posição');
             downButton.onclick = function() {
                 if(tr.rowIndex < table.rows.length - 1)
                 {
@@ -106,6 +114,10 @@ function GenerateLevelTable(fileInput) {
             upButton.className = 'btn btn-dark';
             upButton.style.margin = '5px';
             upButton.style.borderColor = '#6a767f';
+            //tooltip
+            upButton.setAttribute('data-bs-toggle', 'tooltip');
+            upButton.setAttribute('data-bs-placement', 'top');
+            upButton.setAttribute('title', 'Aumentar posição');
             upButton.onclick = function() {
                 if(tr.rowIndex > 1)
                 {
@@ -253,6 +265,10 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
     deleteButton.className = 'btn btn-danger';
     deleteButton.style.margin = '5px';
+    //tooltip
+    deleteButton.setAttribute('data-bs-toggle', 'tooltip');
+    deleteButton.setAttribute('data-bs-placement', 'top');
+    deleteButton.setAttribute('title', 'Deletar level');
     deleteButton.onclick = function() {
         DeletarLinhaLevelTable(table, newRow.rowIndex);
     }
@@ -263,6 +279,10 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     downButton.className = 'btn btn-dark';
     downButton.style.margin = '5px';
     downButton.style.borderColor = '#6a767f';
+    //tooltip
+    downButton.setAttribute('data-bs-toggle', 'tooltip');
+    downButton.setAttribute('data-bs-placement', 'top');
+    downButton.setAttribute('title', 'Diminuir posição');
     downButton.onclick = function() {
         if(newRow.rowIndex < table.rows.length - 1)
         {
@@ -280,6 +300,10 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     upButton.className = 'btn btn-dark';
     upButton.style.margin = '5px';
     upButton.style.borderColor = '#6a767f';
+    //tooltip
+    upButton.setAttribute('data-bs-toggle', 'tooltip');
+    upButton.setAttribute('data-bs-placement', 'top');
+    upButton.setAttribute('title', 'Aumentar posição');
     upButton.onclick = function() {
         if(newRow.rowIndex > 1)
         {

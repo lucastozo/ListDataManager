@@ -210,6 +210,10 @@ function criarBotaoDeletar(tr) {
     deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
     deleteButton.className = 'btn btn-danger';
     deleteButton.style.margin = '5px';
+    //tooltip
+    deleteButton.setAttribute('data-bs-toggle', 'tooltip');
+    deleteButton.setAttribute('data-bs-placement', 'top');
+    deleteButton.setAttribute('title', 'Deletar Record');
     deleteButton.onclick = function() {
         DeletarLinhaPlayerTable(tr);
     }
@@ -220,6 +224,10 @@ function criarBotaoClonar(tr) {
     cloneButton.innerHTML = '<i class="fas fa-clone"></i>';
     cloneButton.className = 'btn btn-primary';
     cloneButton.style.margin = '5px';
+    //tooltip
+    cloneButton.setAttribute('data-bs-toggle', 'tooltip');
+    cloneButton.setAttribute('data-bs-placement', 'top');
+    cloneButton.setAttribute('title', 'Clonar abaixo');
     cloneButton.onclick = function() {
         var clone = tr.cloneNode(true);
         clone.children[clone.children.length - 1].children[0].onclick = criarBotaoDeletar(clone).onclick;
