@@ -70,19 +70,15 @@ function GeneratePlayerTable(fileInput) {
                 }
                 tr.appendChild(td);
             });
-
-            // Adicionar botões de ação: deletar, descer e subir
             var td = document.createElement('td');
-            td.style.textAlign = 'center';
 
-            var deleteButton = document.createElement('button');
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-            deleteButton.className = 'btn btn-danger';
-            deleteButton.style.margin = '5px';
-            deleteButton.onclick = function() {
-                DeletarLinhaTabela(table, tr.rowIndex);
-            }
+            // deletar
+            var deleteButton = criarBotaoDeletar(tr);
             td.appendChild(deleteButton);
+
+            // clonar
+            var cloneButton = criarBotaoClonar(tr);
+            td.appendChild(cloneButton);
 
             tr.appendChild(td);
             tbody.appendChild(tr);
@@ -96,11 +92,12 @@ function GeneratePlayerTable(fileInput) {
     reader.readAsText(file);
 }
 
-function DeletarLinhaTabela(table, rowIndex) {
-    var levelName = table.rows[rowIndex].cells[1].textContent;
-    var playerName = table.rows[rowIndex].cells[2].textContent;
-    var progress = table.rows[rowIndex].cells[3].textContent;
-    var video = table.rows[rowIndex].cells[4].textContent;
+function DeletarLinhaTabela(tr) {
+    var table = tr.parentNode;
+    var levelName = tr.cells[1].textContent;
+    var playerName = tr.cells[2].textContent;
+    var progress = tr.cells[3].textContent;
+    var video = tr.cells[4].textContent;
     var confirmMessage = "O seguinte record será EXCLUÍDO: \n" +
                         "\nLevel: " + levelName + 
                         "\nPlayer: " + playerName +
@@ -108,7 +105,7 @@ function DeletarLinhaTabela(table, rowIndex) {
                         "\nVídeo: " + video +
                         "\n\nEXCLUIR?";
     if(confirm(confirmMessage)) {
-        table.deleteRow(rowIndex);
+        table.deleteRow(tr.rowIndex-1); // eu não sei porque agora precisa do -1, mas alguma magia negra aconteceu e agora precisa
     }
 }
 
@@ -189,14 +186,13 @@ function AdicionarRecord(level, player, progress, video)
     var actionsCell = newRow.insertCell();
     actionsCell.style.textAlign = 'center';
 
-    var deleteButton = document.createElement('button');
-    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteButton.className = 'btn btn-danger';
-    deleteButton.style.margin = '5px';
-    deleteButton.onclick = function() {
-        DeletarLinhaTabela(table, newRow.rowIndex);
-    }
+    // deletar
+    var deleteButton = criarBotaoDeletar(newRow);
     actionsCell.appendChild(deleteButton);
+
+    // clonar
+    var cloneButton = criarBotaoClonar(newRow);
+    actionsCell.appendChild(cloneButton);
 
     document.querySelector('#level').value = '';
     document.querySelector('#player-name').value = '';
@@ -206,6 +202,31 @@ function AdicionarRecord(level, player, progress, video)
     var modal = document.getElementById('addRecord-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
     modalBS.hide();
+}
+
+// javascript me obrigou a fazer as duas funções separadas pro botão deletar e clonar de rows clonadas funcionarem
+function criarBotaoDeletar(tr) {
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+    deleteButton.className = 'btn btn-danger';
+    deleteButton.style.margin = '5px';
+    deleteButton.onclick = function() {
+        DeletarLinhaTabela(tr);
+    }
+    return deleteButton;
+}
+function criarBotaoClonar(tr) {
+    var cloneButton = document.createElement('button');
+    cloneButton.innerHTML = '<i class="fas fa-clone"></i>';
+    cloneButton.className = 'btn btn-primary';
+    cloneButton.style.margin = '5px';
+    cloneButton.onclick = function() {
+        var clone = tr.cloneNode(true);
+        clone.children[clone.children.length - 1].children[0].onclick = criarBotaoDeletar(clone).onclick;
+        clone.children[clone.children.length - 1].children[1].onclick = criarBotaoClonar(clone).onclick;
+        tr.parentNode.insertBefore(clone, tr.nextSibling);
+    }
+    return cloneButton;
 }
 
 //exportar tabela para json
