@@ -92,7 +92,7 @@ function GeneratePlayerTable(fileInput) {
     reader.readAsText(file);
 }
 
-function DeletarLinhaTabela(tr) {
+function DeletarLinhaPlayerTable(tr) {
     var table = tr.parentNode;
     var levelName = tr.cells[1].textContent;
     var playerName = tr.cells[2].textContent;
@@ -211,7 +211,7 @@ function criarBotaoDeletar(tr) {
     deleteButton.className = 'btn btn-danger';
     deleteButton.style.margin = '5px';
     deleteButton.onclick = function() {
-        DeletarLinhaTabela(tr);
+        DeletarLinhaPlayerTable(tr);
     }
     return deleteButton;
 }

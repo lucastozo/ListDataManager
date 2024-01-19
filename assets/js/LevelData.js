@@ -80,7 +80,7 @@ function GenerateLevelTable(fileInput) {
             deleteButton.className = 'btn btn-danger';
             deleteButton.style.margin = '5px';
             deleteButton.onclick = function() {
-                DeletarLinhaTabela(table, tr.rowIndex);
+                DeletarLinhaLevelTable(table, tr.rowIndex);
             }
             td.appendChild(deleteButton);
 
@@ -130,7 +130,7 @@ function GenerateLevelTable(fileInput) {
     reader.readAsText(file);
 }
 
-function DeletarLinhaTabela(table, rowIndex) {
+function DeletarLinhaLevelTable(table, rowIndex) {
     var levelPosition = table.rows[rowIndex].cells[0].textContent;
     var levelName = table.rows[rowIndex].cells[1].textContent;
     var levelCreator = table.rows[rowIndex].cells[2].textContent;
@@ -254,7 +254,7 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     deleteButton.className = 'btn btn-danger';
     deleteButton.style.margin = '5px';
     deleteButton.onclick = function() {
-        DeletarLinhaTabela(table, newRow.rowIndex);
+        DeletarLinhaLevelTable(table, newRow.rowIndex);
     }
     actionsCell.appendChild(deleteButton);
 
