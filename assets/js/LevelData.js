@@ -78,7 +78,7 @@ function GenerateLevelTable(fileInput) {
         table.appendChild(thead);
 
         var tbody = document.createElement('tbody');
-        fetch('/data/listvalues.json')
+        fetch('data/listvalues.json')
         .then(response => response.json())
         .then((data) => {
             mainListMaxPosition = data.Data[0].mainList;
