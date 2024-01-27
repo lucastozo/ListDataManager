@@ -122,13 +122,12 @@ function BotoesManipuladoresRecord()
     var addRemoveContainer = document.getElementById('botoes-manipuladores-container');
 
     var addButton = document.createElement('button');
-    addButton.textContent = 'Adicionar Record';
+    addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Record';
     addButton.className = 'btn btn-success';
     addButton.style.margin = '5px';
     addButton.setAttribute('data-bs-toggle', 'modal');
     addButton.setAttribute('data-bs-target', '#addRecord-modal');
     addRemoveContainer.appendChild(addButton);
-
     var addRecordButton  = document.querySelector('#addRecord');
     addRecordButton.onclick = function() {
         var level = document.querySelector('#level').value;
@@ -140,7 +139,7 @@ function BotoesManipuladoresRecord()
     }
 
     var exportButton = document.createElement('button');
-    exportButton.textContent = 'Exportar Arquivo';
+    exportButton.innerHTML = '<i class="fas fa-file-export"></i> Exportar JSON';
     exportButton.className = 'btn btn-primary';
     exportButton.style.margin = '5px';
     exportButton.onclick = function() {

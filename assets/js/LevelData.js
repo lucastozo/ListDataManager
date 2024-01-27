@@ -20,7 +20,7 @@ function GenerateLevelTable(fileInput) {
 
         var thead = document.createElement('thead');
         var tr = document.createElement('tr');
-        ['Posição', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
+        ['Posição', 'ID', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
             var th = document.createElement('th');
             th.scope = 'col';
             th.style.textAlign = 'center';
@@ -39,7 +39,7 @@ function GenerateLevelTable(fileInput) {
             th.style.textAlign = 'center';
             tr.appendChild(th);
 
-            ['name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
+            ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
                 var td = document.createElement('td');
                 td.style.textAlign = 'center';
                 if (key === 'video_lvl' && item[key]) {
@@ -87,6 +87,47 @@ function GenerateLevelTable(fileInput) {
                 DeletarLinhaLevelTable(table, tr.rowIndex);
             }
             td.appendChild(deleteButton);
+
+            //refresh button: vai fazer uma chamada getLevel e pegar os dados do gdbrowser pra reescrever nome e creator
+            var refreshButton = document.createElement('button');
+            refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+            refreshButton.className = 'btn btn-primary';
+            refreshButton.style.margin = '5px';
+            //tooltip
+            refreshButton.setAttribute('data-bs-toggle', 'tooltip');
+            refreshButton.setAttribute('data-bs-placement', 'top');
+            refreshButton.setAttribute('title', 'Atualizar nome e criador');
+            refreshButton.onclick = async function() {
+                var levelId = tr.cells[1].textContent;
+                if(levelId && levelId.trim() !== '')
+                {
+                    try{
+                        refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>';
+                        refreshButton.disabled = true;
+                        var data = await getLevelInfo(levelId);
+                        if(data)
+                        {
+                            tr.cells[2].textContent = data.name;
+                            //se não tiver publisher, atualizar creator
+                            if(tr.cells[6].textContent.trim() === '')
+                            {
+                                tr.cells[3].textContent = data.author;
+                            }
+                            else
+                            {
+                                tr.cells[6].textContent = data.author;
+                            }
+                        }
+                        refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+                        refreshButton.disabled = false;
+                    } catch (error) {
+                        alert(error);
+                        refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+                        refreshButton.disabled = false;
+                    }
+                }
+            }
+            td.appendChild(refreshButton);
 
             var downButton = document.createElement('button');
             downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
@@ -165,30 +206,30 @@ function DeletarLinhaLevelTable(table, rowIndex) {
 
 function BotoesManipuladoresLevel()
 {
-    var addRemoveContainer = document.getElementById('botoes-manipuladores-container');
+    var buttonsManip = document.getElementById('botoes-manipuladores-container');
     
     var addButton = document.createElement('button');
-    addButton.textContent = 'Adicionar Level';
+    addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Level';
     addButton.className = 'btn btn-success';
     addButton.style.margin = '5px';
     addButton.setAttribute('data-bs-toggle', 'modal');
     addButton.setAttribute('data-bs-target', '#addLevel-modal');
-    addRemoveContainer.appendChild(addButton);
-
+    buttonsManip.appendChild(addButton);
     var addLevelButton  = document.querySelector('#addLevel');
     addLevelButton.onclick = function() {
         var position = document.querySelector('#level-position').value;
+        var id = document.querySelector('#level-id-level').value;
         var name = document.querySelector('#level-name').value;
         var creator = document.querySelector('#level-creator').value;
         var verifier = document.querySelector('#level-verifier').value;
         var video = document.querySelector('#level-video').value;
         var publisher = document.querySelector('#level-publisher').value;
         var listpct = document.querySelector('#level-listpct').value;
-        AdicionarLevel(position, name, creator, verifier, video, publisher, listpct);
+        AdicionarLevel(position, id, name, creator, verifier, video, publisher, listpct);
     }
 
     var exportButton = document.createElement('button');
-    exportButton.textContent = 'Exportar Arquivo';
+    exportButton.innerHTML = '<i class="fas fa-file-export"></i> Exportar JSON';
     exportButton.className = 'btn btn-primary';
     exportButton.style.margin = '5px';
     exportButton.onclick = function() {
@@ -196,13 +237,22 @@ function BotoesManipuladoresLevel()
         var json = ExportarLevel(table);
         DownloadLevelJSON(json);
     }
-    addRemoveContainer.appendChild(exportButton);
+    buttonsManip.appendChild(exportButton);
+
+    var refreshButton = document.createElement('button');
+    refreshButton.innerHTML = '<i class="fas fa-sync"></i> Atualizar Tudo';
+    refreshButton.className = 'btn btn-warning';
+    refreshButton.style.margin = '5px';
+    refreshButton.onclick = function() {
+        RefreshAll();
+    }
+    buttonsManip.appendChild(refreshButton);
 
 }
 
-function AdicionarLevel(position, name, creator, verifier, video, publisher, listpct)
+async function AdicionarLevel(position, id, name, creator, verifier, video, publisher, listpct)
 {
-    if(position === '' || name === '' || creator === '' || verifier === '' || video === '')
+    if(position === '' || id === '' || name === '' || creator === '' || verifier === '' || video === '')
     {
         alert('Preencha todos os campos!');
         return;
@@ -212,6 +262,28 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
         alert('Posição inválida. Insira um valor entre 1 e ' + document.querySelector('#level-table').rows.length + '.');
         return;
     }
+    if(await checkLevelId(id)){
+        //se o level já existe, não adicionar
+        var table = document.querySelector('#level-table');
+        var idExists = false;
+        //verificar se o id já existe percorrendo a tabela
+        for (var i = 0; i < table.rows.length; i++) {
+            var row = table.rows[i];
+            var currentId = row.cells[1].textContent;
+            if (currentId == id) {
+                idExists = true;
+                break;
+            }
+        }
+        if (idExists) {
+            alert('O level com o ID ' + id + ' já existe!');
+            return;
+        }
+    } else {
+        alert('ID inválido. Verifique se o ID está correto e se o level existe.');
+        return;
+    }
+
     var table = document.querySelector('#level-table');
     for(var i = table.rows.length - 1; i >= position; i--)
     {
@@ -228,6 +300,9 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     newRow.spellcheck = false;
     var positionCell = newRow.insertCell();
     positionCell.textContent = position;
+    var idCell = newRow.insertCell();
+    idCell.textContent = id;
+    idCell.contentEditable = true;
     var nameCell = newRow.insertCell();
     nameCell.textContent = name;
     nameCell.contentEditable = true;
@@ -274,6 +349,47 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     }
     actionsCell.appendChild(deleteButton);
 
+    //refresh button: vai fazer uma chamada getLevel e pegar os dados do gdbrowser pra reescrever nome e creator
+    var refreshButton = document.createElement('button');
+    refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+    refreshButton.className = 'btn btn-primary';
+    refreshButton.style.margin = '5px';
+    //tooltip
+    refreshButton.setAttribute('data-bs-toggle', 'tooltip');
+    refreshButton.setAttribute('data-bs-placement', 'top');
+    refreshButton.setAttribute('title', 'Atualizar nome e criador');
+    refreshButton.onclick = async function() {
+        var levelId = newRow.cells[1].textContent;
+        if(levelId && levelId.trim() !== '')
+        {
+            try{
+                refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>';
+                refreshButton.disabled = true;
+                var data = await getLevelInfo(levelId);
+                if(data)
+                {
+                    newRow.cells[2].textContent = data.name;
+                    //se não tiver publisher, atualizar creator
+                    if(newRow.cells[6].textContent.trim() === '')
+                    {
+                        newRow.cells[3].textContent = data.author;
+                    }
+                    else
+                    {
+                        newRow.cells[6].textContent = data.author;
+                    }
+                }
+                refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+                refreshButton.disabled = false;
+            } catch (error) {
+                alert(error);
+                refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+                refreshButton.disabled = false;
+            }
+        }
+    }
+    actionsCell.appendChild(refreshButton);
+
     var downButton = document.createElement('button');
     downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
     downButton.className = 'btn btn-dark';
@@ -317,6 +433,7 @@ function AdicionarLevel(position, name, creator, verifier, video, publisher, lis
     actionsCell.appendChild(upButton);
 
     document.querySelector('#level-position').value = '';
+    document.querySelector('#level-id-level').value = '';
     document.querySelector('#level-name').value = '';
     document.querySelector('#level-creator').value = '';
     document.querySelector('#level-verifier').value = '';
@@ -345,16 +462,17 @@ function ExportarLevel(table)
     {
         var level = {};
         level.position_lvl = parseInt(table.rows[i].cells[0].textContent);
-        level.name_lvl = table.rows[i].cells[1].textContent;
-        level.creator_lvl = table.rows[i].cells[2].textContent;
-        level.verifier_lvl = table.rows[i].cells[3].textContent;
-        level.video_lvl = table.rows[i].cells[4].textContent;
-        var publisher = table.rows[i].cells[5].textContent;
+        level.id_lvl = table.rows[i].cells[1].textContent;
+        level.name_lvl = table.rows[i].cells[2].textContent;
+        level.creator_lvl = table.rows[i].cells[3].textContent;
+        level.verifier_lvl = table.rows[i].cells[4].textContent;
+        level.video_lvl = table.rows[i].cells[5].textContent;
+        var publisher = table.rows[i].cells[6].textContent;
         if(publisher && publisher.trim() !== '')
         {
             level.publisher_lvl = publisher;
         }
-        var listpct = table.rows[i].cells[6].textContent;
+        var listpct = table.rows[i].cells[7].textContent;
         if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100)
         {
             level.listpct_lvl = parseInt(listpct);
@@ -371,4 +489,44 @@ function DownloadLevelJSON(json)
     dlAnchorElem.setAttribute("href", dataStr);
     dlAnchorElem.setAttribute("download", "NEWleveldata.json");
     dlAnchorElem.click();
+}
+
+async function RefreshAll()
+{
+    var confirmMessage = "Tem certeza que deseja atualizar todos os nomes e criadores?\n" +
+                        "Isso pode demorar um pouco e você terá que esperar até que todos os dados sejam atualizados.\n" +
+                        "\nATUALIZAR?";
+    if(!confirm(confirmMessage)) {
+        return;
+    }
+    var table = document.querySelector('#level-table');
+    document.getElementById('overlay').style.display = 'flex';
+    for(var i = 1; i < table.rows.length; i++)
+    {
+        loadingSpinnerLabel = document.getElementById('loading-spinner-label');
+        loadingSpinnerLabel.textContent = i + '/' + (table.rows.length - 1);
+        var levelId = table.rows[i].cells[1].textContent;
+        if(levelId && levelId.trim() !== '')
+        {
+            try{
+                var data = await getLevelInfo(levelId);
+                if(data)
+                {
+                    table.rows[i].cells[2].textContent = data.name;
+                    //se não tiver publisher, atualizar creator
+                    if(table.rows[i].cells[6].textContent.trim() === '')
+                    {
+                        table.rows[i].cells[3].textContent = data.author;
+                    }
+                    else
+                    {
+                        table.rows[i].cells[6].textContent = data.author;
+                    }
+                }
+            } catch (error) {
+                alert(error);
+            }
+        }
+    }
+    document.getElementById('overlay').style.display = 'none';
 }
