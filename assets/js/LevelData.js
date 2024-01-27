@@ -1,3 +1,50 @@
+let mainListMaxPosition;
+let extendedListMaxPosition;
+function updateTable() {
+    var table = document.querySelector('#level-table');
+
+    function updateColor() {
+        for (var i = 0; i < table.rows.length; i++) {
+            listpctHandler(i);
+            var row = table.rows[i];
+            var th = row.cells[0];
+
+            // Pintar a célula de 'posição' de acordo com a posição
+            var position = parseInt(th.textContent);
+            if(position <= mainListMaxPosition) {
+                //striped
+                if(position % 2 != 0) {
+                    th.style.backgroundColor = 'rgba(173, 41, 53, 0.5)';
+                } else {
+                    th.style.backgroundColor = 'rgba(173, 41, 53, 0.25)';
+                }
+            } else if(position <= extendedListMaxPosition) {
+                //striped
+                if(position % 2 != 0) {
+                    th.style.backgroundColor = 'rgba(135, 73, 32, 0.5)';
+                } else {
+                    th.style.backgroundColor = 'rgba(135, 73, 32, 0.25)';
+                }
+            }
+        }
+    }
+
+    function listpctHandler(i) {
+        var row = table.rows[i];
+        var listpct = row.cells[7];
+        var position = parseInt(row.cells[0].textContent);
+        if(position <= mainListMaxPosition) {
+            if(listpct.textContent.trim() === '') {
+                listpct.textContent = 'preencher!';
+            }
+        } else if(position <= extendedListMaxPosition) {
+            listpct.textContent = '';
+        }
+    }
+
+    updateColor();
+}
+
 function IniciarLevelData(fileInput)
 {
     BotoesManipuladoresLevel();
@@ -31,17 +78,28 @@ function GenerateLevelTable(fileInput) {
         table.appendChild(thead);
 
         var tbody = document.createElement('tbody');
-        json.Data.forEach(function(item) {
+        fetch('/data/listvalues.json')
+        .then(response => response.json())
+        .then((data) => {
+            mainListMaxPosition = data.Data[0].mainList;
+            extendedListMaxPosition = data.Data[0].extendedList;
+        json.Data.forEach(function(item, index) {
+            index = index + 1;
             var tr = document.createElement('tr');
             var th = document.createElement('th');
             th.scope = 'row';
             th.textContent = item.position_lvl;
             th.style.textAlign = 'center';
+
             tr.appendChild(th);
 
             ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
                 var td = document.createElement('td');
+                td.contentEditable = true;
+                td.spellcheck = false;
                 td.style.textAlign = 'center';
+
+                // VERIFICAÇOES DE VALORES
                 if (key === 'video_lvl' && item[key]) {
                     var a = document.createElement('a');
                     a.href = item[key];
@@ -49,10 +107,14 @@ function GenerateLevelTable(fileInput) {
                     a.target = '_blank';
                     td.appendChild(a);
                 } else {
-                    td.textContent = item[key];
+                    if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
+                        td.textContent = item[key];
+                    } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
+                        td.textContent = "";
+                    } else {
+                        td.textContent = item[key];
+                    }
                 }
-                td.contentEditable = true;
-                td.spellcheck = false;
                 //ignorar valores não numéricos para listpct
                 if(key === 'listpct_lvl')
                 {
@@ -70,105 +132,23 @@ function GenerateLevelTable(fileInput) {
                 }
                 tr.appendChild(td);
             });
-
-            // Adicionar botões de ação: deletar, descer e subir
             var td = document.createElement('td');
             td.style.textAlign = 'center';
 
-            var deleteButton = document.createElement('button');
-            deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-            deleteButton.className = 'btn btn-danger';
-            deleteButton.style.margin = '5px';
-            //tooltip
-            deleteButton.setAttribute('data-bs-toggle', 'tooltip');
-            deleteButton.setAttribute('data-bs-placement', 'top');
-            deleteButton.setAttribute('title', 'Deletar level');
-            deleteButton.onclick = function() {
-                DeletarLinhaLevelTable(table, tr.rowIndex);
-            }
+            // deletar
+            var deleteButton = createDeleteButton(table, tr);
             td.appendChild(deleteButton);
 
-            //refresh button: vai fazer uma chamada getLevel e pegar os dados do gdbrowser pra reescrever nome e creator
-            var refreshButton = document.createElement('button');
-            refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-            refreshButton.className = 'btn btn-primary';
-            refreshButton.style.margin = '5px';
-            //tooltip
-            refreshButton.setAttribute('data-bs-toggle', 'tooltip');
-            refreshButton.setAttribute('data-bs-placement', 'top');
-            refreshButton.setAttribute('title', 'Atualizar nome e criador');
-            refreshButton.onclick = async function() {
-                var levelId = tr.cells[1].textContent;
-                if(levelId && levelId.trim() !== '')
-                {
-                    try{
-                        refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>';
-                        refreshButton.disabled = true;
-                        var data = await getLevelInfo(levelId);
-                        if(data)
-                        {
-                            tr.cells[2].textContent = data.name;
-                            //se não tiver publisher, atualizar creator
-                            if(tr.cells[6].textContent.trim() === '')
-                            {
-                                tr.cells[3].textContent = data.author;
-                            }
-                            else
-                            {
-                                tr.cells[6].textContent = data.author;
-                            }
-                        }
-                        refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-                        refreshButton.disabled = false;
-                    } catch (error) {
-                        alert(error);
-                        refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-                        refreshButton.disabled = false;
-                    }
-                }
-            }
+            // atualizar
+            var refreshButton = createRefreshButton(tr);
             td.appendChild(refreshButton);
 
-            var downButton = document.createElement('button');
-            downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
-            downButton.className = 'btn btn-dark';
-            downButton.style.margin = '5px';
-            downButton.style.borderColor = '#6a767f';
-            //tooltip
-            downButton.setAttribute('data-bs-toggle', 'tooltip');
-            downButton.setAttribute('data-bs-placement', 'top');
-            downButton.setAttribute('title', 'Diminuir posição');
-            downButton.onclick = function() {
-                if(tr.rowIndex < table.rows.length - 1)
-                {
-                    var linhaPosterior = table.rows[tr.rowIndex + 1];
-                    var posicaoPosterior = linhaPosterior.cells[0].textContent;
-                    linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
-                    tr.cells[0].textContent = posicaoPosterior;
-                    table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
-                }
-            }
+            // diminuir posição
+            var downButton = createDownButton(table, tr);
             td.appendChild(downButton);
 
-            var upButton = document.createElement('button');
-            upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
-            upButton.className = 'btn btn-dark';
-            upButton.style.margin = '5px';
-            upButton.style.borderColor = '#6a767f';
-            //tooltip
-            upButton.setAttribute('data-bs-toggle', 'tooltip');
-            upButton.setAttribute('data-bs-placement', 'top');
-            upButton.setAttribute('title', 'Aumentar posição');
-            upButton.onclick = function() {
-                if(tr.rowIndex > 1)
-                {
-                    var linhaAnterior = table.rows[tr.rowIndex - 1];
-                    var posicaoAnterior = linhaAnterior.cells[0].textContent;
-                    linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
-                    tr.cells[0].textContent = posicaoAnterior;
-                    table.tBodies[0].insertBefore(tr, linhaAnterior);
-                }
-            }
+            // aumentar posição
+            var upButton = createUpButton(table, tr);
             td.appendChild(upButton);
 
             tr.appendChild(td);
@@ -179,6 +159,8 @@ function GenerateLevelTable(fileInput) {
         //adicionar na div table-container
         var tableContainer = document.getElementById('table-container');
         tableContainer.appendChild(table);
+        setTimeout(updateTable, 0);
+        });
     };
     reader.readAsText(file);
 }
@@ -201,6 +183,7 @@ function DeletarLinhaLevelTable(table, rowIndex) {
         {
             table.rows[i].cells[0].textContent = i;
         }
+        updateTable();
     }
 }
 
@@ -247,41 +230,46 @@ function BotoesManipuladoresLevel()
         RefreshAll();
     }
     buttonsManip.appendChild(refreshButton);
-
 }
 
 async function AdicionarLevel(position, id, name, creator, verifier, video, publisher, listpct)
 {
-    if(position === '' || id === '' || name === '' || creator === '' || verifier === '' || video === '')
-    {
-        alert('Preencha todos os campos!');
+    if(!await checarInputs()) {
         return;
     }
-    else if(position < 1 || position > document.querySelector('#level-table').rows.length)
-    {
-        alert('Posição inválida. Insira um valor entre 1 e ' + document.querySelector('#level-table').rows.length + '.');
-        return;
-    }
-    if(await checkLevelId(id)){
-        //se o level já existe, não adicionar
-        var table = document.querySelector('#level-table');
-        var idExists = false;
-        //verificar se o id já existe percorrendo a tabela
-        for (var i = 0; i < table.rows.length; i++) {
-            var row = table.rows[i];
-            var currentId = row.cells[1].textContent;
-            if (currentId == id) {
-                idExists = true;
-                break;
+    async function checarInputs() {
+        if(position === '' || id === '' || name === '' || creator === '' || verifier === '' || video === '')
+        {
+            alert('Preencha todos os campos!');
+            return false;
+        }
+        else if(position < 1 || position > document.querySelector('#level-table').rows.length)
+        {
+            alert('Posição inválida. Insira um valor entre 1 e ' + document.querySelector('#level-table').rows.length + '.');
+            return false;
+        }
+        if(await checkLevelId(id)){
+            //se o level já existe, não adicionar
+            var table = document.querySelector('#level-table');
+            var idExists = false;
+            //verificar se o id já existe percorrendo a tabela
+            for (var i = 0; i < table.rows.length; i++) {
+                var row = table.rows[i];
+                var currentId = row.cells[1].textContent;
+                if (currentId == id) {
+                    idExists = true;
+                    break;
+                }
             }
+            if (idExists) {
+                alert('O level com o ID ' + id + ' já existe!');
+                return false;
+            }
+        } else {
+            alert('ID inválido. Verifique se o ID está correto e se o level existe.');
+            return false;
         }
-        if (idExists) {
-            alert('O level com o ID ' + id + ' já existe!');
-            return;
-        }
-    } else {
-        alert('ID inválido. Verifique se o ID está correto e se o level existe.');
-        return;
+        return true;
     }
 
     var table = document.querySelector('#level-table');
@@ -294,142 +282,53 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
             row.cells[0].textContent = currentPosition + 1;
         }
     }
+    
+    function createCell(row, text, isEditable, isLink = false) {
+        var cell = row.insertCell();
+        cell.textContent = text;
+        cell.contentEditable = isEditable;
+    
+        if (isLink && text) {
+            var a = document.createElement('a');
+            a.href = text;
+            a.textContent = text;
+            a.target = '_blank';
+            a.style.cursor = 'pointer';
+            cell.textContent = '';
+            cell.appendChild(a);
+        }
+    
+        return cell;
+    }
+    
     var rowIndex = parseInt(position);
-
     var newRow = table.insertRow(rowIndex);
     newRow.spellcheck = false;
-    var positionCell = newRow.insertCell();
-    positionCell.textContent = position;
-    var idCell = newRow.insertCell();
-    idCell.textContent = id;
-    idCell.contentEditable = true;
-    var nameCell = newRow.insertCell();
-    nameCell.textContent = name;
-    nameCell.contentEditable = true;
-    var creatorCell = newRow.insertCell();
-    creatorCell.textContent = creator;
-    creatorCell.contentEditable = true;
-    var verifierCell = newRow.insertCell();
-    verifierCell.textContent = verifier;
-    verifierCell.contentEditable = true;
-    var videoCell = newRow.insertCell();
-    //colocar o texto como link
-    if(video)
-    {
-        var a = document.createElement('a');
-        a.href = video;
-        a.textContent = video;
-        a.target = '_blank';
-        a.style.cursor = 'pointer';
-        videoCell.appendChild(a);
-    }
-    else
-    {
-        videoCell.textContent = video;
-    }
-    videoCell.contentEditable = true;
-    var publisherCell = newRow.insertCell();
-    publisherCell.textContent = publisher;
-    publisherCell.contentEditable = true;
-    var listpctCell = newRow.insertCell();
-    listpctCell.textContent = listpct;
-    listpctCell.contentEditable = true;
+    
+    createCell(newRow, position, false);
+    createCell(newRow, id, true);
+    createCell(newRow, name, true);
+    createCell(newRow, creator, true);
+    createCell(newRow, verifier, true);
+    createCell(newRow, video, true, true);
+    createCell(newRow, publisher, true);
+    createCell(newRow, listpct, true);
     var actionsCell = newRow.insertCell();
 
-    var deleteButton = document.createElement('button');
-    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
-    deleteButton.className = 'btn btn-danger';
-    deleteButton.style.margin = '5px';
-    //tooltip
-    deleteButton.setAttribute('data-bs-toggle', 'tooltip');
-    deleteButton.setAttribute('data-bs-placement', 'top');
-    deleteButton.setAttribute('title', 'Deletar level');
-    deleteButton.onclick = function() {
-        DeletarLinhaLevelTable(table, newRow.rowIndex);
-    }
+    // deletar
+    var deleteButton = createDeleteButton(table, newRow);
     actionsCell.appendChild(deleteButton);
 
-    //refresh button: vai fazer uma chamada getLevel e pegar os dados do gdbrowser pra reescrever nome e creator
-    var refreshButton = document.createElement('button');
-    refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-    refreshButton.className = 'btn btn-primary';
-    refreshButton.style.margin = '5px';
-    //tooltip
-    refreshButton.setAttribute('data-bs-toggle', 'tooltip');
-    refreshButton.setAttribute('data-bs-placement', 'top');
-    refreshButton.setAttribute('title', 'Atualizar nome e criador');
-    refreshButton.onclick = async function() {
-        var levelId = newRow.cells[1].textContent;
-        if(levelId && levelId.trim() !== '')
-        {
-            try{
-                refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>';
-                refreshButton.disabled = true;
-                var data = await getLevelInfo(levelId);
-                if(data)
-                {
-                    newRow.cells[2].textContent = data.name;
-                    //se não tiver publisher, atualizar creator
-                    if(newRow.cells[6].textContent.trim() === '')
-                    {
-                        newRow.cells[3].textContent = data.author;
-                    }
-                    else
-                    {
-                        newRow.cells[6].textContent = data.author;
-                    }
-                }
-                refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-                refreshButton.disabled = false;
-            } catch (error) {
-                alert(error);
-                refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
-                refreshButton.disabled = false;
-            }
-        }
-    }
+    // atualizar
+    var refreshButton = createRefreshButton(newRow);
     actionsCell.appendChild(refreshButton);
 
-    var downButton = document.createElement('button');
-    downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
-    downButton.className = 'btn btn-dark';
-    downButton.style.margin = '5px';
-    downButton.style.borderColor = '#6a767f';
-    //tooltip
-    downButton.setAttribute('data-bs-toggle', 'tooltip');
-    downButton.setAttribute('data-bs-placement', 'top');
-    downButton.setAttribute('title', 'Diminuir posição');
-    downButton.onclick = function() {
-        if(newRow.rowIndex < table.rows.length - 1)
-        {
-            var linhaPosterior = table.rows[newRow.rowIndex + 1];
-            var posicaoPosterior = linhaPosterior.cells[0].textContent;
-            linhaPosterior.cells[0].textContent = newRow.cells[0].textContent;
-            newRow.cells[0].textContent = posicaoPosterior;
-            table.tBodies[0].insertBefore(newRow, linhaPosterior.nextSibling);
-        }
-    }
+    // diminuir posição
+    var downButton = createDownButton(table, newRow);
     actionsCell.appendChild(downButton);
 
-    var upButton = document.createElement('button');
-    upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
-    upButton.className = 'btn btn-dark';
-    upButton.style.margin = '5px';
-    upButton.style.borderColor = '#6a767f';
-    //tooltip
-    upButton.setAttribute('data-bs-toggle', 'tooltip');
-    upButton.setAttribute('data-bs-placement', 'top');
-    upButton.setAttribute('title', 'Aumentar posição');
-    upButton.onclick = function() {
-        if(newRow.rowIndex > 1)
-        {
-            var linhaAnterior = table.rows[newRow.rowIndex - 1];
-            var posicaoAnterior = linhaAnterior.cells[0].textContent;
-            linhaAnterior.cells[0].textContent = newRow.cells[0].textContent;
-            newRow.cells[0].textContent = posicaoAnterior;
-            table.tBodies[0].insertBefore(newRow, linhaAnterior);
-        }
-    }
+    // aumentar posição
+    var upButton = createUpButton(table, newRow);
     actionsCell.appendChild(upButton);
 
     document.querySelector('#level-position').value = '';
@@ -440,6 +339,7 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
     document.querySelector('#level-video').value = '';
     document.querySelector('#level-publisher').value = '';
     document.querySelector('#level-listpct').value = '';
+    updateTable();
 
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
@@ -473,7 +373,7 @@ function ExportarLevel(table)
             level.publisher_lvl = publisher;
         }
         var listpct = table.rows[i].cells[7].textContent;
-        if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100)
+        if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100 && listpct !== 'preencher!')
         {
             level.listpct_lvl = parseInt(listpct);
         }
@@ -493,8 +393,9 @@ function DownloadLevelJSON(json)
 
 async function RefreshAll()
 {
-    var confirmMessage = "Tem certeza que deseja atualizar todos os nomes e criadores?\n" +
-                        "Isso pode demorar um pouco e você terá que esperar até que todos os dados sejam atualizados.\n" +
+    var confirmMessage = "Tem certeza que deseja atualizar todos os nomes e criadores?\n\n" +
+                        "A atualização irá reescrever o nome de todos os levels e seus criadores para os nomes atuais no Geometry Dash.\n" +
+                        "Isso pode causar alterações indesejadas, por favor, revise a tabela depois de atualizar.\n\n" +
                         "\nATUALIZAR?";
     if(!confirm(confirmMessage)) {
         return;
@@ -529,4 +430,101 @@ async function RefreshAll()
         }
     }
     document.getElementById('overlay').style.display = 'none';
+}
+
+function createDeleteButton(table, tr) {
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+    deleteButton.className = 'btn btn-danger';
+    deleteButton.style.margin = '5px';
+    deleteButton.setAttribute('data-bs-toggle', 'tooltip');
+    deleteButton.setAttribute('data-bs-placement', 'top');
+    deleteButton.setAttribute('title', 'Deletar level');
+    deleteButton.onclick = function() {
+        DeletarLinhaLevelTable(table, tr.rowIndex);
+    }
+    return deleteButton;
+}
+
+function createRefreshButton(tr) {
+    var refreshButton = document.createElement('button');
+    refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+    refreshButton.className = 'btn btn-primary';
+    refreshButton.style.margin = '5px';
+    refreshButton.setAttribute('data-bs-toggle', 'tooltip');
+    refreshButton.setAttribute('data-bs-placement', 'top');
+    refreshButton.setAttribute('title', 'Atualizar nome e criador');
+    refreshButton.onclick = async function() {
+        var levelId = tr.cells[1].textContent;
+        if(levelId && levelId.trim() !== '') {
+            try {
+                refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>';
+                refreshButton.disabled = true;
+                var data = await getLevelInfo(levelId);
+                if(data) {
+                    tr.cells[2].textContent = data.name;
+                    if(tr.cells[6].textContent.trim() === '') {
+                        tr.cells[3].textContent = data.author;
+                    } else {
+                        tr.cells[6].textContent = data.author;
+                    }
+                }
+            } catch (error) {
+                alert(error);
+            }
+        }
+        refreshButton.innerHTML = '<i class="fas fa-sync"></i>';
+        refreshButton.disabled = false;
+    }
+    return refreshButton;
+}
+
+function createDownButton(table, tr) {
+    var downButton = document.createElement('button');
+    downButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+    downButton.className = 'btn btn-dark';
+    downButton.style.margin = '5px';
+    downButton.style.borderColor = '#6a767f';
+    //tooltip
+    downButton.setAttribute('data-bs-toggle', 'tooltip');
+    downButton.setAttribute('data-bs-placement', 'top');
+    downButton.setAttribute('title', 'Diminuir posição');
+    downButton.onclick = function() {
+        if(tr.rowIndex < table.rows.length - 1)
+        {
+            var linhaPosterior = table.rows[tr.rowIndex + 1];
+            var posicaoPosterior = linhaPosterior.cells[0].textContent;
+            linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
+            tr.cells[0].textContent = posicaoPosterior;
+            table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
+
+            updateTable();
+        }
+    }
+    return downButton;
+}
+
+function createUpButton(table, tr) {
+    var upButton = document.createElement('button');
+    upButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+    upButton.className = 'btn btn-dark';
+    upButton.style.margin = '5px';
+    upButton.style.borderColor = '#6a767f';
+    //tooltip
+    upButton.setAttribute('data-bs-toggle', 'tooltip');
+    upButton.setAttribute('data-bs-placement', 'top');
+    upButton.setAttribute('title', 'Aumentar posição');
+    upButton.onclick = function() {
+        if(tr.rowIndex > 1)
+        {
+            var linhaAnterior = table.rows[tr.rowIndex - 1];
+            var posicaoAnterior = linhaAnterior.cells[0].textContent;
+            linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
+            tr.cells[0].textContent = posicaoAnterior;
+            table.tBodies[0].insertBefore(tr, linhaAnterior);
+            
+            updateTable();
+        }
+    }
+    return upButton;
 }
