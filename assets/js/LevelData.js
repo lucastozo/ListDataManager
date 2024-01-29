@@ -33,10 +33,13 @@ function updateTable() {
         var row = table.rows[i];
         var listpct = row.cells[7];
         var position = parseInt(row.cells[0].textContent);
+
+        listpct.contentEditable = false;
         if(position <= mainListMaxPosition) {
             if(listpct.textContent.trim() === '') {
                 listpct.textContent = 'preencher!';
             }
+            listpct.contentEditable = true;
         } else if(position <= extendedListMaxPosition) {
             listpct.textContent = '';
         }
@@ -95,7 +98,7 @@ function GenerateLevelTable(fileInput) {
 
             ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
                 var td = document.createElement('td');
-                td.contentEditable = true;
+                td.contentEditable = key !== 'name_lvl';
                 td.spellcheck = false;
                 td.style.textAlign = 'center';
 
@@ -402,10 +405,13 @@ async function RefreshAll()
     }
     var table = document.querySelector('#level-table');
     document.getElementById('overlay').style.display = 'flex';
+
+    var nameMap = {};
     for(var i = 1; i < table.rows.length; i++)
     {
         loadingSpinnerLabel = document.getElementById('loading-spinner-label');
         loadingSpinnerLabel.textContent = i + '/' + (table.rows.length - 1);
+
         var levelId = table.rows[i].cells[1].textContent;
         if(levelId && levelId.trim() !== '')
         {
@@ -414,14 +420,34 @@ async function RefreshAll()
                 if(data)
                 {
                     table.rows[i].cells[2].textContent = data.name;
-                    //se não tiver publisher, atualizar creator
-                    if(table.rows[i].cells[6].textContent.trim() === '')
-                    {
-                        table.rows[i].cells[3].textContent = data.author;
+
+                    var creatorCell = table.rows[i].cells[3];
+                    var verifierCell = table.rows[i].cells[4];
+                    var publisherCell = table.rows[i].cells[6];
+
+                    var oldName = creatorCell.textContent.toLowerCase();
+
+                    //se existir publiser, não atualizar criador
+                    if(publisherCell.textContent.trim() === '') {
+                        creatorCell.textContent = data.author;
+                    } else {
+                        publisherCell.textContent = data.author;
                     }
-                    else
-                    {
-                        table.rows[i].cells[6].textContent = data.author;
+
+                    // atualizar todas as ocorrencias do nome antigo
+                    if(nameMap[oldName] === undefined) {
+                        nameMap[oldName] = data.author;
+                        for(var j = 1; j < table.rows.length; j++) {
+                            var verifierCellOther = table.rows[j].cells[4];
+                            var publisherCellOther = table.rows[j].cells[6];
+                    
+                            if(verifierCellOther.textContent.toLowerCase() === oldName) {
+                                verifierCellOther.textContent = data.author;
+                            }
+                            if(publisherCellOther.textContent.toLowerCase() === oldName) {
+                                publisherCellOther.textContent = data.author;
+                            }
+                        }
                     }
                 }
             } catch (error) {

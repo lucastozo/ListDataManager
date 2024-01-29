@@ -51,7 +51,7 @@ function GeneratePlayerTable(fileInput) {
                 } else {
                     td.textContent = item[key];
                 }
-                td.contentEditable = true;
+                td.contentEditable = key !== 'level_name';
                 td.spellcheck = false;
                 //ignorar valores não numéricos para listpct
                 if(key === 'progress')
