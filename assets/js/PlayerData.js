@@ -96,6 +96,27 @@ function GeneratePlayerTable(fileInput) {
         //adicionar na div table-container
         var tableContainer = document.getElementById('table-container');
         tableContainer.appendChild(table);
+
+        // função para fazer um input de texto com autocomplete
+        function getPlayers()
+        {
+            var table = document.querySelector("#player-table");
+            let playerNames = new Map();
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                var playerName = row.cells[2].innerHTML;
+                playerNames.set(playerName.toLowerCase(), playerName);
+            }
+            playerNames = Array.from(playerNames.values());
+            playerNames.sort();
+            //preencher a datalist players-list
+            var datalist = document.getElementById("players-list");
+            for (var i = 0; i < playerNames.length; i++) {
+                var option = document.createElement("option");
+                option.value = playerNames[i];
+                datalist.appendChild(option);
+            }
+        }
+        getPlayers();
     };
     reader.readAsText(file);
 }
