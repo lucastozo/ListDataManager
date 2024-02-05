@@ -163,7 +163,47 @@ function GenerateLevelTable(fileInput) {
         var tableContainer = document.getElementById('table-container');
         tableContainer.appendChild(table);
         setTimeout(updateTable, 0);
+
+        // função para fazer um input de texto com autocomplete
+        function getCreators()
+        {
+            var table = document.querySelector("#level-table");
+            let creatorNames = new Map();
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                var creatorName = row.cells[3].innerHTML;
+                creatorNames.set(creatorName.toLowerCase(), creatorName);
+            }
+            creatorNames = Array.from(creatorNames.values());
+            creatorNames.sort();
+            //preencher a datalist creators-list
+            var datalist = document.getElementById("creators-list");
+            for (var i = 0; i < creatorNames.length; i++) {
+                var option = document.createElement("option");
+                option.value = creatorNames[i];
+                datalist.appendChild(option);
+            }
+        }
+        getCreators();
         });
+        function getVerifiers()
+        {
+            var table = document.querySelector("#level-table");
+            let verifierNames = new Map();
+            for (var i = 1, row; row = table.rows[i]; i++) {
+                var verifierName = row.cells[4].innerHTML;
+                verifierNames.set(verifierName.toLowerCase(), verifierName);
+            }
+            verifierNames = Array.from(verifierNames.values());
+            verifierNames.sort();
+            //preencher a datalist verifiers-list
+            var datalist = document.getElementById("verifiers-list");
+            for (var i = 0; i < verifierNames.length; i++) {
+                var option = document.createElement("option");
+                option.value = verifierNames[i];
+                datalist.appendChild(option);
+            }
+        }
+        getVerifiers();
     };
     reader.readAsText(file);
 }
