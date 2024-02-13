@@ -25,6 +25,8 @@ function updateTable() {
                 } else {
                     th.style.backgroundColor = 'rgba(135, 73, 32, 0.25)';
                 }
+            } else {
+                th.style.backgroundColor = 'rgba(0, 0, 0, 0.0)';
             }
         }
     }
