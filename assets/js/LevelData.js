@@ -6,6 +6,7 @@ function updateTable() {
     function updateColor() {
         for (var i = 0; i < table.rows.length; i++) {
             listpctHandler(i);
+            hideLegacyLevels(i);
             var row = table.rows[i];
             var th = row.cells[0];
 
@@ -44,6 +45,14 @@ function updateTable() {
             listpct.contentEditable = true;
         } else if(position <= extendedListMaxPosition) {
             listpct.textContent = '';
+        }
+    }
+
+    function hideLegacyLevels(i) {
+        var row = table.rows[i];
+        var position = parseInt(row.cells[0].textContent);
+        if(position > extendedListMaxPosition) {
+            row.style.display = 'none';
         }
     }
 
