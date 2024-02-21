@@ -489,17 +489,21 @@ async function RefreshAll()
                     if(nameMap[oldName] === undefined) {
                         nameMap[oldName] = data.author;
                         for(var j = 1; j < table.rows.length; j++) {
-                            var verifierCellOther = table.rows[j].cells[4];
-                            var publisherCellOther = table.rows[j].cells[6];
-                    
-                            if(verifierCellOther.textContent.toLowerCase() === oldName) {
-                                verifierCellOther.textContent = data.author;
-                            }
-                            if(publisherCellOther.textContent.toLowerCase() === oldName) {
-                                publisherCellOther.textContent = data.author;
+                            var levelIdOther = table.rows[j].cells[1].textContent;
+                            if (levelIdOther === levelId) {
+                                var verifierCellOther = table.rows[j].cells[4];
+                                var publisherCellOther = table.rows[j].cells[6];
+                        
+                                if(verifierCellOther.textContent.toLowerCase() === oldName) {
+                                    verifierCellOther.textContent = data.author;
+                                }
+                                if(publisherCellOther.textContent.toLowerCase() === oldName) {
+                                    publisherCellOther.textContent = data.author;
+                                }
                             }
                         }
                     }
+                    // o código acima parece errar em alguns casos, TODO: corrigir
                 }
             } catch (error) {
                 alert(error);
