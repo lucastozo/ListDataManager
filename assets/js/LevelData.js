@@ -53,170 +53,165 @@ function updateTable() {
         var position = parseInt(row.cells[0].textContent);
         if(position > extendedListMaxPosition) {
             row.style.display = 'none';
+        } else {
+            row.style.display = '';
         }
     }
+
+    // função para fazer um input de texto com autocomplete
+    function getCreators()
+    {
+        var table = document.querySelector("#level-table");
+        let creatorNames = new Map();
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            var creatorName = row.cells[3].innerHTML;
+            creatorNames.set(creatorName.toLowerCase(), creatorName);
+        }
+        creatorNames = Array.from(creatorNames.values());
+        creatorNames.sort();
+        //preencher a datalist creators-list
+        var datalist = document.getElementById("creators-list");
+        for (var i = 0; i < creatorNames.length; i++) {
+            var option = document.createElement("option");
+            option.value = creatorNames[i];
+            datalist.appendChild(option);
+        }
+    }
+    function getVerifiers()
+    {
+        var table = document.querySelector("#level-table");
+        let verifierNames = new Map();
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            var verifierName = row.cells[4].innerHTML;
+            verifierNames.set(verifierName.toLowerCase(), verifierName);
+        }
+        verifierNames = Array.from(verifierNames.values());
+        verifierNames.sort();
+        //preencher a datalist verifiers-list
+        var datalist = document.getElementById("verifiers-list");
+        for (var i = 0; i < verifierNames.length; i++) {
+            var option = document.createElement("option");
+            option.value = verifierNames[i];
+            datalist.appendChild(option);
+        }
+    }
+    getCreators();
+    getVerifiers();
 
     updateColor();
 }
 
-function IniciarLevelData(fileInput)
+function IniciarLevelData(json)
 {
     BotoesManipuladoresLevel();
-    GenerateLevelTable(fileInput);
+    GenerateLevelTable(json);
 }
 
-function GenerateLevelTable(fileInput) {
-    var file = fileInput.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var fileContent = e.target.result;
-        var json = JSON.parse(fileContent);
-        json.Data.sort(function(a, b) {
-            return a.position_lvl - b.position_lvl;
-        });
+function GenerateLevelTable(json) {
+    json.Data.sort(function(a, b) {
+        return a.position_lvl - b.position_lvl;
+    });
 
-        var table = document.createElement('table');
-        table.className = 'table table-striped table-hover align-middle';
-        table.id = 'level-table';
+    var table = document.createElement('table');
+    table.className = 'table table-striped table-hover align-middle';
+    table.id = 'level-table';
 
-        var thead = document.createElement('thead');
+    var thead = document.createElement('thead');
+    var tr = document.createElement('tr');
+    ['Posição', 'ID', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
+        var th = document.createElement('th');
+        th.scope = 'col';
+        th.style.textAlign = 'center';
+        th.textContent = header;
+        tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    fetch('data/listvalues.json')
+    .then(response => response.json())
+    .then((data) => {
+        mainListMaxPosition = data.Data[0].mainList;
+        extendedListMaxPosition = data.Data[0].extendedList;
+    json.Data.forEach(function(item, index) {
+        index = index + 1;
         var tr = document.createElement('tr');
-        ['Posição', 'ID', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
-            var th = document.createElement('th');
-            th.scope = 'col';
-            th.style.textAlign = 'center';
-            th.textContent = header;
-            tr.appendChild(th);
-        });
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        var th = document.createElement('th');
+        th.scope = 'row';
+        th.textContent = item.position_lvl;
+        th.style.textAlign = 'center';
 
-        var tbody = document.createElement('tbody');
-        fetch('data/listvalues.json')
-        .then(response => response.json())
-        .then((data) => {
-            mainListMaxPosition = data.Data[0].mainList;
-            extendedListMaxPosition = data.Data[0].extendedList;
-        json.Data.forEach(function(item, index) {
-            index = index + 1;
-            var tr = document.createElement('tr');
-            var th = document.createElement('th');
-            th.scope = 'row';
-            th.textContent = item.position_lvl;
-            th.style.textAlign = 'center';
+        tr.appendChild(th);
 
-            tr.appendChild(th);
-
-            ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
-                var td = document.createElement('td');
-                td.contentEditable = key !== 'name_lvl';
-                td.spellcheck = false;
-                td.style.textAlign = 'center';
-
-                // VERIFICAÇOES DE VALORES
-                if (key === 'video_lvl' && item[key]) {
-                    var a = document.createElement('a');
-                    a.href = item[key];
-                    a.textContent = item[key];
-                    a.target = '_blank';
-                    td.appendChild(a);
-                } else {
-                    if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
-                        td.textContent = item[key];
-                    } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
-                        td.textContent = "";
-                    } else {
-                        td.textContent = item[key];
-                    }
-                }
-                //ignorar valores não numéricos para listpct
-                if(key === 'listpct_lvl')
-                {
-                    var value = td.textContent;
-                    td.oninput = function() {
-                        if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
-                        {
-                            this.textContent = value;
-                        }
-                        else
-                        {
-                            value = this.textContent;
-                        }
-                    }
-                }
-                tr.appendChild(td);
-            });
+        ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
             var td = document.createElement('td');
+            td.contentEditable = key !== 'name_lvl';
+            td.spellcheck = false;
             td.style.textAlign = 'center';
 
-            // deletar
-            var deleteButton = createDeleteButton(table, tr);
-            td.appendChild(deleteButton);
-
-            // atualizar
-            var refreshButton = createRefreshButton(tr);
-            td.appendChild(refreshButton);
-
-            // diminuir posição
-            var downButton = createDownButton(table, tr);
-            td.appendChild(downButton);
-
-            // aumentar posição
-            var upButton = createUpButton(table, tr);
-            td.appendChild(upButton);
-
+            // VERIFICAÇOES DE VALORES
+            if (key === 'video_lvl' && item[key]) {
+                var a = document.createElement('a');
+                a.href = item[key];
+                a.textContent = item[key];
+                a.target = '_blank';
+                td.appendChild(a);
+            } else {
+                if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
+                    td.textContent = item[key];
+                } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
+                    td.textContent = "";
+                } else {
+                    td.textContent = item[key];
+                }
+            }
+            //ignorar valores não numéricos para listpct
+            if(key === 'listpct_lvl')
+            {
+                var value = td.textContent;
+                td.oninput = function() {
+                    if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
+                    {
+                        this.textContent = value;
+                    }
+                    else
+                    {
+                        value = this.textContent;
+                    }
+                }
+            }
             tr.appendChild(td);
-            tbody.appendChild(tr);
         });
-        table.appendChild(tbody);
-        document.body.appendChild(table);
-        //adicionar na div table-container
-        var tableContainer = document.getElementById('table-container');
-        tableContainer.appendChild(table);
-        setTimeout(updateTable, 0);
+        var td = document.createElement('td');
+        td.style.textAlign = 'center';
 
-        // função para fazer um input de texto com autocomplete
-        function getCreators()
-        {
-            var table = document.querySelector("#level-table");
-            let creatorNames = new Map();
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                var creatorName = row.cells[3].innerHTML;
-                creatorNames.set(creatorName.toLowerCase(), creatorName);
-            }
-            creatorNames = Array.from(creatorNames.values());
-            creatorNames.sort();
-            //preencher a datalist creators-list
-            var datalist = document.getElementById("creators-list");
-            for (var i = 0; i < creatorNames.length; i++) {
-                var option = document.createElement("option");
-                option.value = creatorNames[i];
-                datalist.appendChild(option);
-            }
-        }
-        getCreators();
-        });
-        function getVerifiers()
-        {
-            var table = document.querySelector("#level-table");
-            let verifierNames = new Map();
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                var verifierName = row.cells[4].innerHTML;
-                verifierNames.set(verifierName.toLowerCase(), verifierName);
-            }
-            verifierNames = Array.from(verifierNames.values());
-            verifierNames.sort();
-            //preencher a datalist verifiers-list
-            var datalist = document.getElementById("verifiers-list");
-            for (var i = 0; i < verifierNames.length; i++) {
-                var option = document.createElement("option");
-                option.value = verifierNames[i];
-                datalist.appendChild(option);
-            }
-        }
-        getVerifiers();
-    };
-    reader.readAsText(file);
+        // deletar
+        var deleteButton = createDeleteButton(table, tr);
+        td.appendChild(deleteButton);
+
+        // atualizar
+        var refreshButton = createRefreshButton(tr);
+        td.appendChild(refreshButton);
+
+        // diminuir posição
+        var downButton = createDownButton(table, tr);
+        td.appendChild(downButton);
+
+        // aumentar posição
+        var upButton = createUpButton(table, tr);
+        td.appendChild(upButton);
+
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+    //adicionar na div table-container
+    var tableContainer = document.getElementById('table-container');
+    tableContainer.appendChild(table);
+    setTimeout(updateTable, 0);
+    });
 }
 
 function DeletarLinhaLevelTable(table, rowIndex) {

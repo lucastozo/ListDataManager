@@ -1,124 +1,117 @@
-function IniciarPlayerData(fileInput)
+function IniciarPlayerData(json)
 {
     BotoesManipuladoresRecord();
-    GeneratePlayerTable(fileInput);
+    GeneratePlayerTable(json);
 }
 
-function GeneratePlayerTable(fileInput) {
-    var file = fileInput.files[0];
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var fileContent = e.target.result;
-        var json = JSON.parse(fileContent);
-        json.Data.sort(function(a, b) {
-            return a.level_name.localeCompare(b.level_name);
-        });
+function GeneratePlayerTable(json) {
+    json.Data.sort(function(a, b) {
+        return a.level_name.localeCompare(b.level_name);
+    });
 
-        var table = document.createElement('table');
-        table.className = 'table table-striped table-hover align-middle';
-        table.id = 'player-table';
+    var table = document.createElement('table');
+    table.className = 'table table-striped table-hover align-middle';
+    table.id = 'player-table';
 
-        var thead = document.createElement('thead');
+    var thead = document.createElement('thead');
+    var tr = document.createElement('tr');
+    ['', 'Level', 'Player', 'Progresso', 'Vídeo', 'Ações'].forEach(function(header) {
+        var th = document.createElement('th');
+        th.scope = 'col';
+        th.style.textAlign = 'center';
+        th.textContent = header;
+        tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    json.Data.forEach(function(item) {
         var tr = document.createElement('tr');
-        ['', 'Level', 'Player', 'Progresso', 'Vídeo', 'Ações'].forEach(function(header) {
-            var th = document.createElement('th');
-            th.scope = 'col';
-            th.style.textAlign = 'center';
-            th.textContent = header;
-            tr.appendChild(th);
-        });
-        thead.appendChild(tr);
-        table.appendChild(thead);
+        var th = document.createElement('th');
+        th.scope = 'row';
+        th.textContent = item.position_lvl;
+        th.style.textAlign = 'center';
+        tr.appendChild(th);
 
-        var tbody = document.createElement('tbody');
-        json.Data.forEach(function(item) {
-            var tr = document.createElement('tr');
-            var th = document.createElement('th');
-            th.scope = 'row';
-            th.textContent = item.position_lvl;
-            th.style.textAlign = 'center';
-            tr.appendChild(th);
-
-            ['level_name', 'player_name', 'progress', 'video'].forEach(function(key) {
-                var td = document.createElement('td');
-                td.style.textAlign = 'center';
-                if (key === 'video' && item[key]) {
-                    var a = document.createElement('a');
-                    a.href = item[key];
-                    a.textContent = item[key];
-                    a.target = '_blank';
-                    td.appendChild(a);
-                } else {
-                    td.textContent = item[key];
-                }
-                td.contentEditable = key !== 'level_name';
-                td.spellcheck = false;
-                //ignorar valores não numéricos para listpct
-                if(key === 'progress')
-                {
-                    var value = td.textContent;
-                    td.oninput = function() {
-                        if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
-                        {
-                            this.textContent = value;
-                        }
-                        else
-                        {
-                            value = this.textContent;
-                        }
+        ['level_name', 'player_name', 'progress', 'video'].forEach(function(key) {
+            var td = document.createElement('td');
+            td.style.textAlign = 'center';
+            if (key === 'video' && item[key]) {
+                var a = document.createElement('a');
+                a.href = item[key];
+                a.textContent = item[key];
+                a.target = '_blank';
+                td.appendChild(a);
+            } else {
+                td.textContent = item[key];
+            }
+            td.contentEditable = key !== 'level_name';
+            td.spellcheck = false;
+            //ignorar valores não numéricos para listpct
+            if(key === 'progress')
+            {
+                var value = td.textContent;
+                td.oninput = function() {
+                    if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
+                    {
+                        this.textContent = value;
+                    }
+                    else
+                    {
+                        value = this.textContent;
                     }
                 }
-                tr.appendChild(td);
-            });
-            var td = document.createElement('td');
-
-            // deletar
-            var deleteButton = criarBotaoDeletar(tr);
-            td.appendChild(deleteButton);
-
-            // clonar
-            var cloneButton = criarBotaoClonar(tr);
-            td.appendChild(cloneButton);
-
-            // descer
-            var downButton = criarBotaoDescer(tr);
-            td.appendChild(downButton);
-
-            // subir
-            var upButton = criarBotaoSubir(tr);
-            td.appendChild(upButton);
-
+            }
             tr.appendChild(td);
-            tbody.appendChild(tr);
         });
-        table.appendChild(tbody);
-        document.body.appendChild(table);
-        //adicionar na div table-container
-        var tableContainer = document.getElementById('table-container');
-        tableContainer.appendChild(table);
+        var td = document.createElement('td');
 
-        // função para fazer um input de texto com autocomplete
-        function getPlayers()
-        {
-            var table = document.querySelector("#player-table");
-            let playerNames = new Map();
-            for (var i = 1, row; row = table.rows[i]; i++) {
-                var playerName = row.cells[2].innerHTML;
-                playerNames.set(playerName.toLowerCase(), playerName);
-            }
-            playerNames = Array.from(playerNames.values());
-            playerNames.sort();
-            //preencher a datalist players-list
-            var datalist = document.getElementById("players-list");
-            for (var i = 0; i < playerNames.length; i++) {
-                var option = document.createElement("option");
-                option.value = playerNames[i];
-                datalist.appendChild(option);
-            }
+        // deletar
+        var deleteButton = criarBotaoDeletar(tr);
+        td.appendChild(deleteButton);
+
+        // clonar
+        var cloneButton = criarBotaoClonar(tr);
+        td.appendChild(cloneButton);
+
+        // descer
+        var downButton = criarBotaoDescer(tr);
+        td.appendChild(downButton);
+
+        // subir
+        var upButton = criarBotaoSubir(tr);
+        td.appendChild(upButton);
+
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+    //adicionar na div table-container
+    var tableContainer = document.getElementById('table-container');
+    tableContainer.appendChild(table);
+
+    // função para fazer um input de texto com autocomplete
+    function getPlayers()
+    {
+        var table = document.querySelector("#player-table");
+        let playerNames = new Map();
+        for (var i = 1, row; row = table.rows[i]; i++) {
+            var playerName = row.cells[2].innerHTML;
+            playerNames.set(playerName.toLowerCase(), playerName);
         }
-        getPlayers();
-    };
-    reader.readAsText(file);
+        playerNames = Array.from(playerNames.values());
+        playerNames.sort();
+        //preencher a datalist players-list
+        var datalist = document.getElementById("players-list");
+        for (var i = 0; i < playerNames.length; i++) {
+            var option = document.createElement("option");
+            option.value = playerNames[i];
+            datalist.appendChild(option);
+        }
+    }
+    getPlayers();
 }
 
 function DeletarLinhaPlayerTable(tr) {

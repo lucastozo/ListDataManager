@@ -19,19 +19,20 @@
                 <p>Leia a <a href="https://github.com/lucastozo/ListDataManager-web/wiki" target="_blank">wiki</a> para instruções</p>
             </div>
         </section>
-        <div id="form-container">
-            <div class="sendFile">
-                <!-- send data file -->
-                <input class="form-control" type="file" id="formFile" accept=".json">
-                <label for="formFile" class="form-label">(selecione um arquivo data.json)</label>
-            </div>
-            <div>
-                <button class="btn btn-outline-light" type="submit" id="submit-button" disabled>Enviar</button>
-            </div>
+
+        <div id="data-type-buttons">
+            <button class="btn btn-outline-light" id="levels-button">
+                <i class="fa-solid fa-gear fa-2xl"></i> <br>Levels
+            </button>
+            <button class="btn btn-outline-light" id="records-button">
+                <i class="fa-regular fa-circle-play fa-2xl"></i> <br>Records
+            </button>
         </div>
+
         <div id="botoes-manipuladores-container"></div>
         <div id="table-container"></div>
     </section>
+
     <!-- level modal -->
     <div class="modal fade" id="addLevel-modal" tabindex="-1" aria-labelledby="addLevelLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">

@@ -4,6 +4,13 @@ body
     background-color: #1f2428 !important;
 }
 
+#levels-button, #records-button
+{
+    padding: 50px;
+    width: 100%;
+    margin-top: 20px;
+}
+
 .section
 {
     padding: 50px;
@@ -18,13 +25,6 @@ body
     color: #698cec;
     transition: 0.5s;
     cursor: pointer;
-}
-
-.sendFile
-{
-    margin: 10px;
-    border: 1px solid #505050;
-    border-radius: 5px;
 }
 
 #table-container
