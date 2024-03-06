@@ -156,7 +156,7 @@ function GenerateLevelTable(json) {
 
             ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
                 var td = document.createElement('td');
-                td.contentEditable = key !== 'name_lvl';
+                td.contentEditable = key !== 'name_lvl' && key !== 'id_lvl';
                 td.spellcheck = false;
                 td.style.textAlign = 'center';
 
@@ -226,9 +226,9 @@ function GenerateLevelTable(json) {
 
 function DeletarLinhaLevelTable(table, rowIndex) {
     var levelPosition = table.rows[rowIndex].cells[0].textContent;
-    var levelName = table.rows[rowIndex].cells[1].textContent;
-    var levelCreator = table.rows[rowIndex].cells[2].textContent;
-    var levelVerifier = table.rows[rowIndex].cells[3].textContent;
+    var levelName = table.rows[rowIndex].cells[2].textContent;
+    var levelCreator = table.rows[rowIndex].cells[3].textContent;
+    var levelVerifier = table.rows[rowIndex].cells[4].textContent;
     var confirmMessage = "O seguinte level será EXCLUÍDO: \n" +
                         "\nPosição: " + levelPosition + 
                         "\nNome: " + levelName + 
