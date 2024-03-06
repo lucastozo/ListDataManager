@@ -1,7 +1,17 @@
-function IniciarPlayerData(json)
+IniciarPlayerData();
+function IniciarPlayerData()
 {
-    BotoesManipuladoresRecord();
-    GeneratePlayerTable(json);
+    document.getElementById('overlay').style.display = 'flex';
+    fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/playerdata.json')
+    .then(response => response.json())
+    .then(data => 
+    {
+        var decodedContent = atob(data.content);
+        var jsonContent = JSON.parse(decodedContent);
+        BotoesManipuladoresRecord();
+        GeneratePlayerTable(jsonContent);
+        document.getElementById('overlay').style.display = 'none';
+    });
 }
 
 function GeneratePlayerTable(json) {
@@ -148,7 +158,6 @@ function BotoesManipuladoresRecord()
         var player = document.querySelector('#player-name').value;
         var progress = document.querySelector('#progress').value;
         var video = document.querySelector('#video').value;
-        console.log(level, player, progress, video);
         AdicionarRecord(level, player, progress, video);
     }
 

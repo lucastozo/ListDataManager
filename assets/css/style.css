@@ -20,6 +20,11 @@ body
     flex-direction: column;
 }
 
+#header-title
+{
+    color: #fff;
+}
+
 #header-title:hover
 {
     color: #698cec;

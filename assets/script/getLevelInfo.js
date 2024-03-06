@@ -2,7 +2,6 @@ async function getLevelInfo(levelId) {
     try {
         const response = await fetch(`https://gdbrowser.com/api/level/${levelId}`);
         const data = await response.json();
-        console.log(data);
         return data
     } catch {
         throw new Error("Não foi possível coletar as informações do level (você tem certeza que o ID está correto?)")
