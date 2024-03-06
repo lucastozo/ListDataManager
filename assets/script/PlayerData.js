@@ -180,66 +180,100 @@ function AdicionarRecord(level, player, progress, video)
         alert("Preencha os campos obrigatórios!");
         return;
     }
-    else if(isNaN(progress) || progress < 0 || progress > 100)
+    let levelInput = level;
+    let listpctLevel;
+    let levelFound = false;
+    fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json')
+    .then(response => response.json())
+    .then(data =>
     {
-        alert("Progresso inválido!");
-        return;
-    }
-    var table = document.querySelector('#player-table');
+        var decodedContent = atob(data.content);
+        //search for the level
+        levelInput = JSON.parse(decodedContent).Data.find(function(element) {
+            if (element.name_lvl === level)
+            {
+                return element;
+            }
+        });
+        if(levelInput)
+        {
+            listpctLevel = levelInput.listpct_lvl;
+            // if listpctlevel is undefined, it will be 100
+            if(!listpctLevel)
+            {
+                listpctLevel = 100;
+            }
+            levelFound = true;
+            if(isNaN(progress) || progress < 0 || progress > 100 || progress < listpctLevel)
+            {
+                alert("Progresso inválido ou menor que list% (" + listpctLevel + ")!");
+                return;
+            }
+            insertRecord(level, player, progress, video);
+        } else {
+            alert("Level não encontrado!");
+            return;
+        }
+    });
 
-    var newRow = table.insertRow(1);
-    newRow.insertCell();
-    newRow.spellcheck = false;
-    var levelCell = newRow.insertCell();
-    levelCell.textContent = level;
-    levelCell.contentEditable = true;
-    var playerCell = newRow.insertCell();
-    playerCell.textContent = player;
-    playerCell.contentEditable = true;
-    var progressCell = newRow.insertCell();
-    progressCell.textContent = progress;
-    progressCell.contentEditable = true;
-    var videoCell = newRow.insertCell();
-    if(video)
+    function insertRecord(level, player, progress, video)
     {
-        var a = document.createElement('a');
-        a.href = video;
-        a.textContent = video;
-        a.target = '_blank';
-        videoCell.appendChild(a);
+        var table = document.querySelector('#player-table');
+        var newRow = table.insertRow(1);
+        newRow.insertCell();
+        newRow.spellcheck = false;
+        var levelCell = newRow.insertCell();
+        levelCell.textContent = level;
+        levelCell.contentEditable = true;
+        var playerCell = newRow.insertCell();
+        playerCell.textContent = player;
+        playerCell.contentEditable = true;
+        var progressCell = newRow.insertCell();
+        progressCell.textContent = progress;
+        progressCell.contentEditable = true;
+        var videoCell = newRow.insertCell();
+        if(video)
+        {
+            var a = document.createElement('a');
+            a.href = video;
+            a.textContent = video;
+            a.target = '_blank';
+            videoCell.appendChild(a);
+        }
+        else
+        {
+            videoCell.textContent = video;
+        }
+        videoCell.contentEditable = true;
+        var actionsCell = newRow.insertCell();
+        actionsCell.style.textAlign = 'center';
+
+        // deletar
+        var deleteButton = criarBotaoDeletar(newRow);
+        actionsCell.appendChild(deleteButton);
+
+        // clonar
+        var cloneButton = criarBotaoClonar(newRow);
+        actionsCell.appendChild(cloneButton);
+
+        // descer
+        var downButton = criarBotaoDescer(newRow);
+        actionsCell.appendChild(downButton);
+
+        // subir
+        var upButton = criarBotaoSubir(newRow);
+        actionsCell.appendChild(upButton);
+
+        document.querySelector('#level-id-record').value = '';
+        document.querySelector('#level').value = '';
+        document.querySelector('#player-name').value = '';
+        document.querySelector('#progress').value = '';
+        document.querySelector('#video').value = '';
+
+        var modal = document.getElementById('addRecord-modal');
+        var modalBS = bootstrap.Modal.getInstance(modal);
+        modalBS.hide();
     }
-    else
-    {
-        videoCell.textContent = video;
-    }
-    videoCell.contentEditable = true;
-    var actionsCell = newRow.insertCell();
-    actionsCell.style.textAlign = 'center';
-
-    // deletar
-    var deleteButton = criarBotaoDeletar(newRow);
-    actionsCell.appendChild(deleteButton);
-
-    // clonar
-    var cloneButton = criarBotaoClonar(newRow);
-    actionsCell.appendChild(cloneButton);
-
-    // descer
-    var downButton = criarBotaoDescer(newRow);
-    actionsCell.appendChild(downButton);
-
-    // subir
-    var upButton = criarBotaoSubir(newRow);
-    actionsCell.appendChild(upButton);
-
-    document.querySelector('#level').value = '';
-    document.querySelector('#player-name').value = '';
-    document.querySelector('#progress').value = '';
-    document.querySelector('#video').value = '';
-
-    var modal = document.getElementById('addRecord-modal');
-    var modalBS = bootstrap.Modal.getInstance(modal);
-    modalBS.hide();
 }
 
 // javascript me obrigou a fazer as duas funções separadas pro botão deletar e clonar de rows clonadas funcionarem
