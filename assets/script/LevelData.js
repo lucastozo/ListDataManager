@@ -139,7 +139,7 @@ function GenerateLevelTable(json) {
     table.appendChild(thead);
 
     var tbody = document.createElement('tbody');
-    fetch('/ListDataManager-web/data/listvalues.json')
+    fetch('/data/listvalues.json')
     .then(response => response.json())
     .then((data) => {
         mainListMaxPosition = data.Data[0].mainList;
