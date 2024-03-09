@@ -30,8 +30,8 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-            <h1 class="modal-title fs-5" id="addLevelLabel">Adicionar level</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h1 class="modal-title fs-5" id="addLevelLabel">Adicionar level</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
@@ -69,6 +69,31 @@
         </div>
         </div>
     </div>
+
+    <!-- create pr modal -->
+    <div class="modal fade" id="sendChanges-modal" tabindex="-1" aria-labelledby="sendChangesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="sendChangesLabel">Enviar mudanças</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="level-pr-user-key" placeholder="Chave de usuário">
+                </div>
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="level-pr-token" placeholder="Token">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="sendChanges" class="btn btn-primary" onclick="sendLevelChanges();">Enviar</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
     <!-- loading overlay -->
     <div id="overlay" class="position-fixed justify-content-center align-items-center" style="display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0,0,0,0.5); z-index: 9999;">
         <div class="d-flex flex-column justify-content-center align-items-center h-100">
@@ -78,6 +103,8 @@
             <p id="loading-spinner-label" class="text-light mt-3">Carregando...</p>
         </div>
     </div>
+
+    <script src="/assets/script/sendChanges.js"></script>
     <script src="/assets/script/LevelData.js"></script>
     <script src="/assets/script/getLevelInfo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>

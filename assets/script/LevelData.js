@@ -270,16 +270,21 @@ function BotoesManipuladoresLevel()
         AdicionarLevel(position, id, name, creator, verifier, video, publisher, listpct);
     }
 
-    var exportButton = document.createElement('button');
-    exportButton.innerHTML = '<i class="fas fa-file-export"></i> Exportar JSON';
-    exportButton.className = 'btn btn-primary';
-    exportButton.style.margin = '5px';
-    exportButton.onclick = function() {
+    var sendButton = document.createElement('button');
+    sendButton.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Alterações';
+    sendButton.className = 'btn btn-primary';
+    sendButton.style.margin = '5px';
+    
+    sendButton.setAttribute('data-bs-toggle', 'modal');
+    sendButton.setAttribute('data-bs-target', '#sendChanges-modal');
+    /*
+    sendButton.onclick = function() {
         var table = document.getElementById('level-table');
         var json = ExportarLevel(table);
         DownloadLevelJSON(json);
     }
-    buttonsManip.appendChild(exportButton);
+    */
+    buttonsManip.appendChild(sendButton);
 
     var refreshButton = document.createElement('button');
     refreshButton.innerHTML = '<i class="fas fa-sync"></i> Atualizar Tudo';
@@ -403,42 +408,6 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
     modalBS.hide();
-}
-
-//exportar tabela para json
-function ExportarLevel(table)
-{
-    var date = new Date();
-    var day = date.getDate();
-    var month = date.getMonth() + 1; //January is 0
-    var year = date.getFullYear();
-    var hour = date.getHours();
-    var minute = date.getMinutes();
-    var second = date.getSeconds();
-    var generatedAt = day + '/' + month + '/' + year + ' ' + hour + ':' + minute + ':' + second;
-    var json = {GeradoEm: generatedAt, TipoData: "level", Data: []};
-    for(var i = 1; i < table.rows.length; i++)
-    {
-        var level = {};
-        level.position_lvl = parseInt(table.rows[i].cells[0].textContent);
-        level.id_lvl = table.rows[i].cells[1].textContent;
-        level.name_lvl = table.rows[i].cells[2].textContent;
-        level.creator_lvl = table.rows[i].cells[3].textContent;
-        level.verifier_lvl = table.rows[i].cells[4].textContent;
-        level.video_lvl = table.rows[i].cells[5].textContent;
-        var publisher = table.rows[i].cells[6].textContent;
-        if(publisher && publisher.trim() !== '')
-        {
-            level.publisher_lvl = publisher;
-        }
-        var listpct = table.rows[i].cells[7].textContent;
-        if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100 && listpct !== 'preencher!')
-        {
-            level.listpct_lvl = parseInt(listpct);
-        }
-        json.Data.push(level);
-    }
-    return json;
 }
 
 function DownloadLevelJSON(json)
