@@ -51,7 +51,7 @@ function sendLevelChanges()
     */
 
     const json = ExportarLevel(document.getElementById('level-table'));
-    const changes = json;
+    const changes = "placeholder for changes";
 
     fetch('/api/send-level-changes', {
         method: 'POST',
