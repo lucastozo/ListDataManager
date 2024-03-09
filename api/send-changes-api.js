@@ -59,8 +59,8 @@ module.exports = async (req, res) =>
         return;
     }
 
-    // Deletar a branch 'copy'
-    await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/copy`, {
+    // Deletar a branch 'list-changes-commits'
+    await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
         headers: {
             'Authorization': `token ${token}`
         }
@@ -73,9 +73,9 @@ module.exports = async (req, res) =>
         }
     });
 
-    // Criar a branch 'copy' a partir do último commit da branch 'main'
+    // Criar a branch 'list-changes-commits' a partir do último commit da branch 'main'
     await axios.post(`https://api.github.com/repos/${owner}/${repo}/git/refs`, {
-        ref: 'refs/heads/copy',
+        ref: `refs/heads/${branch}`,
         sha: mainSha
     }, {
         headers: {
