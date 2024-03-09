@@ -2,7 +2,6 @@
     "name": "list-data-manager",
     "version": "1.0.0",
     "dependencies": {
-      "axios": "^0.21.1"
+      "axios": ">=0.28.0"
     }
   }
-  
