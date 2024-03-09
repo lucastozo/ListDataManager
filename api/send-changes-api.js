@@ -1,7 +1,12 @@
 const axios = require('axios');
 module.exports = async (req, res) => 
 {
-    const { key, tokenHash, changes } = req.body;
+    const { userKey, tokenHash, changelog, changes, dataMode } = req.body;
+    // userKey: unique key for each user
+    // tokenHash: hash of the DLBRauto github token
+    // changelog: description of the changes
+    // changes: JSON
+    // dataMode: 1 = level, 2 = records
 
     const adminData = process.env.USERS_KEYS;
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
@@ -11,19 +16,31 @@ module.exports = async (req, res) =>
 
     let userName;
     for (let i = 0; i < adminDataSplit.length; i++) {
-        if (adminDataSplit[i] === key) {
+        if (adminDataSplit[i] === userKey) {
             userName = adminDataSplit[i].split('@')[0];
             break;
         }
     }
     if (!userName || tokenHash !== hash) {
-        res.status(403).json({ message: 'Acesso negado' });
+        res.status(403).json({ message: 'Acesso negado. Chave de usuário ou token inválidos' });
         return;
     }
   
     const owner = 'lucastozo';
     const repo = 'VercelAlvo';
-    const path = 'data/leveldata.json';
+    let path;
+    switch (dataMode)
+    {
+        case 1:
+            path = 'data/leveldata.json';
+            break;
+        case 2:
+            path = 'data/playerdata.json';
+            break;
+        default:
+            res.status(400).json({ message: 'Modo de dados inválido' });
+            return;
+    }
     const message = 'List Changes';
     const content = Buffer.from(changes).toString('base64');
     const branch = 'copy';
@@ -85,7 +102,7 @@ module.exports = async (req, res) =>
     
     const horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     const title = 'List Changes';
-    const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changes}`;
+    const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
     const head = 'copy';
     const base = 'main';
     const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;

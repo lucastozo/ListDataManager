@@ -71,11 +71,11 @@
     </div>
 
     <!-- create pr modal -->
-    <div class="modal fade" id="sendChanges-modal" tabindex="-1" aria-labelledby="sendChangesLabel" aria-hidden="true">
+    <div class="modal fade" id="send-changes-modal" tabindex="-1" aria-labelledby="send-changesLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="sendChangesLabel">Enviar mudanças</h1>
+                <h1 class="modal-title fs-5" id="send-changesLabel">Enviar mudanças</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -83,12 +83,18 @@
                     <input type="text" class="form-control" id="level-pr-user-key" placeholder="Chave de usuário">
                 </div>
                 <div class="mb-3">
-                    <input type="text" class="form-control" id="level-pr-token" placeholder="Token">
+                    <textarea class="form-control" id="level-pr-token" placeholder="Token" style="height: 5em"></textarea>
                 </div>
+                <div class="mb-3">
+                    <textarea class="form-control" id="level-pr-changelog" placeholder="Changelog" style="height: 10em"></textarea>
+                </div>
+            </div>
+            <div id="send-changes-error-div" class="text-center align-items-center" style="display: none; padding: 10px; margin: 10px; margin-top: 0; border-radius: 5px;">
+                <p id="send-changes-error-msg" style="margin-bottom: 0;">Mensagem de erro</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" id="sendChanges" class="btn btn-primary" onclick="sendLevelChanges();">Enviar</button>
+                <button type="button" id="send-changes-button" class="btn btn-primary" onclick="sendLevelChanges();">Enviar</button>
             </div>
         </div>
         </div>

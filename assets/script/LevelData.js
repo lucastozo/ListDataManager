@@ -274,16 +274,8 @@ function BotoesManipuladoresLevel()
     sendButton.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Alterações';
     sendButton.className = 'btn btn-primary';
     sendButton.style.margin = '5px';
-    
     sendButton.setAttribute('data-bs-toggle', 'modal');
-    sendButton.setAttribute('data-bs-target', '#sendChanges-modal');
-    /*
-    sendButton.onclick = function() {
-        var table = document.getElementById('level-table');
-        var json = ExportarLevel(table);
-        DownloadLevelJSON(json);
-    }
-    */
+    sendButton.setAttribute('data-bs-target', '#send-changes-modal');
     buttonsManip.appendChild(sendButton);
 
     var refreshButton = document.createElement('button');
@@ -408,15 +400,6 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
     modalBS.hide();
-}
-
-function DownloadLevelJSON(json)
-{
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
-    var dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "NEWleveldata.json");
-    dlAnchorElem.click();
 }
 
 async function RefreshAll()

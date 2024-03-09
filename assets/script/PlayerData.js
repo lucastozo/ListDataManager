@@ -143,7 +143,7 @@ function DeletarLinhaPlayerTable(tr) {
 
 function BotoesManipuladoresRecord()
 {
-    var addRemoveContainer = document.getElementById('botoes-manipuladores-container');
+    var buttonsManip = document.getElementById('botoes-manipuladores-container');
 
     var addButton = document.createElement('button');
     addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Record';
@@ -151,7 +151,7 @@ function BotoesManipuladoresRecord()
     addButton.style.margin = '5px';
     addButton.setAttribute('data-bs-toggle', 'modal');
     addButton.setAttribute('data-bs-target', '#addRecord-modal');
-    addRemoveContainer.appendChild(addButton);
+    buttonsManip.appendChild(addButton);
     var addRecordButton  = document.querySelector('#addRecord');
     addRecordButton.onclick = function() {
         var level = document.querySelector('#level').value;
@@ -161,16 +161,14 @@ function BotoesManipuladoresRecord()
         AdicionarRecord(level, player, progress, video);
     }
 
-    var exportButton = document.createElement('button');
-    exportButton.innerHTML = '<i class="fas fa-file-export"></i> Exportar JSON';
-    exportButton.className = 'btn btn-primary';
-    exportButton.style.margin = '5px';
-    exportButton.onclick = function() {
-        var table = document.getElementById('player-table');
-        var json = ExportarRecord(table);
-        DownloadRecordJSON(json);
-    }
-    addRemoveContainer.appendChild(exportButton);
+    var sendButton = document.createElement('button');
+    sendButton.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Alterações';
+    sendButton.className = 'btn btn-primary';
+    sendButton.style.margin = '5px';
+    sendButton.setAttribute('data-bs-toggle', 'modal');
+    sendButton.setAttribute('data-bs-target', '#send-changes-modal');
+    buttonsManip.appendChild(sendButton);
+    buttonsManip.appendChild(sendButton);
 }
 
 function AdicionarRecord(level, player, progress, video)
@@ -347,41 +345,4 @@ function criarBotaoSubir(tr) {
         }
     }
     return upButton;
-}
-
-//exportar tabela para json
-function ExportarRecord(table)
-{
-    var date = new Date();
-    var day = date.getDate();
-    var month = date.getMonth() + 1; //January is 0
-    var year = date.getFullYear();
-    var hour = date.getHours();
-    var minute = date.getMinutes();
-    var second = date.getSeconds();
-    var generatedAt = day + '/' + month + '/' + year + ' ' + hour + ':' + minute + ':' + second;
-    var json = {GeradoEm: generatedAt, TipoData: "record", Data: []};
-    for(var i = 1; i < table.rows.length; i++)
-    {
-        var record = {};
-        record.level_name = table.rows[i].cells[1].textContent;
-        record.player_name = table.rows[i].cells[2].textContent;
-        record.progress = parseInt(table.rows[i].cells[3].textContent);
-        var video = table.rows[i].cells[4].textContent;
-        if(video && video.trim() !== '')
-        {
-            record.video = video;
-        }
-        json.Data.push(record);
-    }
-    return json;
-}
-
-function DownloadRecordJSON(json)
-{
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
-    var dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "NEWplayerdata.json");
-    dlAnchorElem.click();
 }
