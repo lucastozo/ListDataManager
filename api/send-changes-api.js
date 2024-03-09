@@ -27,7 +27,7 @@ module.exports = async (req, res) =>
     }
   
     const owner = 'lucastozo';
-    const repo = 'VercelAlvo';
+    const repo = 'DemonlistBR';
     let path;
     switch (dataMode)
     {
@@ -43,7 +43,7 @@ module.exports = async (req, res) =>
     }
     const message = 'List Changes';
     const content = Buffer.from(changes).toString('base64');
-    const branch = 'copy';
+    const branch = 'list-changes-commits';
 
     // Obter a lista de pull requests
     const { data: pullRequests } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls`, {
@@ -103,7 +103,7 @@ module.exports = async (req, res) =>
     const horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     const title = 'List Changes';
     const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
-    const head = 'copy';
+    const head = 'list-changes-commits';
     const base = 'main';
     const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
   
