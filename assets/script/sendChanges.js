@@ -133,7 +133,7 @@ function checkInputs(userKey, tokenHash, changelog)
 {
     if(!userKey || !tokenHash || !changelog)
     {
-        alert("Preencha todos os campos!");
+        errorMsgHandler("Preencha todos os campos!", 2);
         sendButtonHandler(1);
         return false;
     }
