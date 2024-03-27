@@ -1,3 +1,12 @@
+let mainListMaxPosition
+let extendedListMaxPosition
+fetch('/data/listvalues.json')
+.then(response => response.json())
+.then(data => {
+    mainListMaxPosition = data.Data[0].mainList;
+    extendedListMaxPosition = data.Data[0].extendedList;
+});
+
 IniciarPlayerData();
 function IniciarPlayerData()
 {
@@ -179,8 +188,6 @@ function AdicionarRecord(level, player, progress, video)
         return;
     }
     let levelInput = level;
-    let listpctLevel;
-    let levelFound = false;
     fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json')
     .then(response => response.json())
     .then(data =>
@@ -195,14 +202,19 @@ function AdicionarRecord(level, player, progress, video)
         });
         if(levelInput)
         {
-            listpctLevel = levelInput.listpct_lvl;
+            let levelPosition = levelInput.position_lvl;
+            let listpctLevel = levelInput.listpct_lvl;
             // if listpctlevel is undefined, it will be 100
             if(!listpctLevel)
             {
                 listpctLevel = 100;
             }
-            levelFound = true;
-            if(isNaN(progress) || progress < 0 || progress > 100 || progress < listpctLevel)
+            if(levelPosition > extendedListMaxPosition) // check if level is in the list
+            {
+                alert("Erro: O level está fora da lista!");
+                return;
+            }
+            if(isNaN(progress) || progress < 0 || progress > 100 || progress < listpctLevel) // check if progress is valid
             {
                 alert("Progresso inválido ou menor que list% (" + listpctLevel + ")!");
                 return;
