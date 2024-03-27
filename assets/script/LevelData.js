@@ -168,18 +168,7 @@ function GenerateLevelTable(json) {
                 a.textContent = item[key];
                 a.target = '_blank';
                 td.appendChild(a);
-            } else {
-                if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
-                    td.textContent = item[key];
-                } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
-                    td.textContent = "";
-                } else {
-                    td.textContent = item[key];
-                }
-            }
-            //ignorar valores não numéricos para listpct
-            if(key === 'listpct_lvl')
-            {
+            } else if (key === 'listpct_lvl') {
                 var value = td.textContent;
                 td.oninput = function() {
                     if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
@@ -191,6 +180,13 @@ function GenerateLevelTable(json) {
                         value = this.textContent;
                     }
                 }
+                if (index <= mainListMaxPosition) {
+                    td.textContent = item[key];
+                } else if (index <= extendedListMaxPosition) {
+                    td.textContent = "";
+                }
+            } else {
+                td.textContent = item[key];
             }
             tr.appendChild(td);
         });
@@ -221,7 +217,7 @@ function GenerateLevelTable(json) {
     //adicionar na div table-container
     var tableContainer = document.getElementById('table-container');
     tableContainer.appendChild(table);
-    setTimeout(updateTable, 0);
+    updateTable();
 }
 
 function DeletarLinhaLevelTable(table, rowIndex) {
