@@ -1,3 +1,12 @@
+let mainListMaxPosition;
+let extendedListMaxPosition;
+fetch('/data/listvalues.json')
+.then(response => response.json())
+.then((data) => {
+    mainListMaxPosition = data.Data[0].mainList;
+    extendedListMaxPosition = data.Data[0].extendedList;
+});
+
 IniciarLevelData();
 function IniciarLevelData()
 {
@@ -13,9 +22,6 @@ function IniciarLevelData()
         document.getElementById('overlay').style.display = 'none';
     });
 }
-
-let mainListMaxPosition;
-let extendedListMaxPosition;
 function updateTable() {
     var table = document.querySelector('#level-table');
 
@@ -139,89 +145,83 @@ function GenerateLevelTable(json) {
     table.appendChild(thead);
 
     var tbody = document.createElement('tbody');
-    fetch('/data/listvalues.json')
-    .then(response => response.json())
-    .then((data) => {
-        mainListMaxPosition = data.Data[0].mainList;
-        extendedListMaxPosition = data.Data[0].extendedList;
-        json.Data.forEach(function(item, index) {
-            index = index + 1;
-            var tr = document.createElement('tr');
-            var th = document.createElement('th');
-            th.scope = 'row';
-            th.textContent = item.position_lvl;
-            th.style.textAlign = 'center';
+    json.Data.forEach(function(item, index) {
+        index = index + 1;
+        var tr = document.createElement('tr');
+        var th = document.createElement('th');
+        th.scope = 'row';
+        th.textContent = item.position_lvl;
+        th.style.textAlign = 'center';
 
-            tr.appendChild(th);
+        tr.appendChild(th);
 
-            ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
-                var td = document.createElement('td');
-                td.contentEditable = key !== 'name_lvl' && key !== 'id_lvl';
-                td.spellcheck = false;
-                td.style.textAlign = 'center';
-
-                // VERIFICAÇOES DE VALORES
-                if (key === 'video_lvl' && item[key]) {
-                    var a = document.createElement('a');
-                    a.href = item[key];
-                    a.textContent = item[key];
-                    a.target = '_blank';
-                    td.appendChild(a);
-                } else {
-                    if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
-                        td.textContent = item[key];
-                    } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
-                        td.textContent = "";
-                    } else {
-                        td.textContent = item[key];
-                    }
-                }
-                //ignorar valores não numéricos para listpct
-                if(key === 'listpct_lvl')
-                {
-                    var value = td.textContent;
-                    td.oninput = function() {
-                        if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
-                        {
-                            this.textContent = value;
-                        }
-                        else
-                        {
-                            value = this.textContent;
-                        }
-                    }
-                }
-                tr.appendChild(td);
-            });
+        ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
             var td = document.createElement('td');
+            td.contentEditable = key !== 'name_lvl' && key !== 'id_lvl';
+            td.spellcheck = false;
             td.style.textAlign = 'center';
 
-            // deletar
-            var deleteButton = createDeleteButton(table, tr);
-            td.appendChild(deleteButton);
-
-            // atualizar
-            var refreshButton = createRefreshButton(tr);
-            td.appendChild(refreshButton);
-
-            // diminuir posição
-            var downButton = createDownButton(table, tr);
-            td.appendChild(downButton);
-
-            // aumentar posição
-            var upButton = createUpButton(table, tr);
-            td.appendChild(upButton);
-
+            // VERIFICAÇOES DE VALORES
+            if (key === 'video_lvl' && item[key]) {
+                var a = document.createElement('a');
+                a.href = item[key];
+                a.textContent = item[key];
+                a.target = '_blank';
+                td.appendChild(a);
+            } else {
+                if(key === 'listpct_lvl' && (index) <= mainListMaxPosition) {
+                    td.textContent = item[key];
+                } else if(key === 'listpct_lvl' && (index) <= extendedListMaxPosition) {
+                    td.textContent = "";
+                } else {
+                    td.textContent = item[key];
+                }
+            }
+            //ignorar valores não numéricos para listpct
+            if(key === 'listpct_lvl')
+            {
+                var value = td.textContent;
+                td.oninput = function() {
+                    if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
+                    {
+                        this.textContent = value;
+                    }
+                    else
+                    {
+                        value = this.textContent;
+                    }
+                }
+            }
             tr.appendChild(td);
-            tbody.appendChild(tr);
         });
-        table.appendChild(tbody);
-        document.body.appendChild(table);
-        //adicionar na div table-container
-        var tableContainer = document.getElementById('table-container');
-        tableContainer.appendChild(table);
-        setTimeout(updateTable, 0);
+        var td = document.createElement('td');
+        td.style.textAlign = 'center';
+
+        // deletar
+        var deleteButton = createDeleteButton(table, tr);
+        td.appendChild(deleteButton);
+
+        // atualizar
+        var refreshButton = createRefreshButton(tr);
+        td.appendChild(refreshButton);
+
+        // diminuir posição
+        var downButton = createDownButton(table, tr);
+        td.appendChild(downButton);
+
+        // aumentar posição
+        var upButton = createUpButton(table, tr);
+        td.appendChild(upButton);
+
+        tr.appendChild(td);
+        tbody.appendChild(tr);
     });
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+    //adicionar na div table-container
+    var tableContainer = document.getElementById('table-container');
+    tableContainer.appendChild(table);
+    setTimeout(updateTable, 0);
 }
 
 function DeletarLinhaLevelTable(table, rowIndex) {
@@ -299,9 +299,9 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
             alert('Preencha todos os campos!');
             return false;
         }
-        else if(position < 1 || position > document.querySelector('#level-table').rows.length)
+        else if(position < 1 || position > extendedListMaxPosition)
         {
-            alert('Posição inválida. Insira um valor entre 1 e ' + document.querySelector('#level-table').rows.length + '.');
+            alert('Posição inválida. Insira um valor entre 1 e ' + extendedListMaxPosition +'.');
             return false;
         }
         if(await checkLevelId(id)){
