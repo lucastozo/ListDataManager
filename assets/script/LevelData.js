@@ -18,8 +18,10 @@ function IniciarLevelData()
         var decodedContent = atob(data.content);
         var jsonContent = JSON.parse(decodedContent);
         BotoesManipuladoresLevel();
-        GenerateLevelTable(jsonContent);
-        document.getElementById('overlay').style.display = 'none';
+        GenerateLevelTable(jsonContent).then(() => {
+            updateTable();
+            document.getElementById('overlay').style.display = 'none';
+        });
     });
 }
 function updateTable() {
@@ -124,100 +126,102 @@ function updateTable() {
 }
 
 function GenerateLevelTable(json) {
-    json.Data.sort(function(a, b) {
-        return a.position_lvl - b.position_lvl;
-    });
+    return new Promise((resolve, reject) => {
+        json.Data.sort(function(a, b) {
+            return a.position_lvl - b.position_lvl;
+        });
 
-    var table = document.createElement('table');
-    table.className = 'table table-striped table-hover align-middle';
-    table.id = 'level-table';
+        var table = document.createElement('table');
+        table.className = 'table table-striped table-hover align-middle';
+        table.id = 'level-table';
 
-    var thead = document.createElement('thead');
-    var tr = document.createElement('tr');
-    ['Posição', 'ID', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
-        var th = document.createElement('th');
-        th.scope = 'col';
-        th.style.textAlign = 'center';
-        th.textContent = header;
-        tr.appendChild(th);
-    });
-    thead.appendChild(tr);
-    table.appendChild(thead);
-
-    var tbody = document.createElement('tbody');
-    json.Data.forEach(function(item, index) {
-        index = index + 1;
+        var thead = document.createElement('thead');
         var tr = document.createElement('tr');
-        var th = document.createElement('th');
-        th.scope = 'row';
-        th.textContent = item.position_lvl;
-        th.style.textAlign = 'center';
+        ['Posição', 'ID', 'Nome', 'Criador', 'Verificador', 'Vídeo', 'Publicador', 'List%', 'Ações'].forEach(function(header) {
+            var th = document.createElement('th');
+            th.scope = 'col';
+            th.style.textAlign = 'center';
+            th.textContent = header;
+            tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+        table.appendChild(thead);
 
-        tr.appendChild(th);
+        var tbody = document.createElement('tbody');
+        json.Data.forEach(function(item, index) {
+            index = index + 1;
+            var tr = document.createElement('tr');
+            var th = document.createElement('th');
+            th.scope = 'row';
+            th.textContent = item.position_lvl;
+            th.style.textAlign = 'center';
 
-        ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
+            tr.appendChild(th);
+
+            ['id_lvl', 'name_lvl', 'creator_lvl', 'verifier_lvl', 'video_lvl', 'publisher_lvl', 'listpct_lvl'].forEach(function(key) {
+                var td = document.createElement('td');
+                td.contentEditable = key !== 'name_lvl' && key !== 'id_lvl';
+                td.spellcheck = false;
+                td.style.textAlign = 'center';
+
+                // VERIFICAÇOES DE VALORES
+                if (key === 'video_lvl' && item[key]) {
+                    var a = document.createElement('a');
+                    a.href = item[key];
+                    a.textContent = item[key];
+                    a.target = '_blank';
+                    td.appendChild(a);
+                } else if (key === 'listpct_lvl') {
+                    var value = td.textContent;
+                    td.oninput = function() {
+                        if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
+                        {
+                            this.textContent = value;
+                        }
+                        else
+                        {
+                            value = this.textContent;
+                        }
+                    }
+                    if (index <= mainListMaxPosition) {
+                        td.textContent = item[key];
+                    } else if (index <= extendedListMaxPosition) {
+                        td.textContent = "";
+                    }
+                } else {
+                    td.textContent = item[key];
+                }
+                tr.appendChild(td);
+            });
             var td = document.createElement('td');
-            td.contentEditable = key !== 'name_lvl' && key !== 'id_lvl';
-            td.spellcheck = false;
             td.style.textAlign = 'center';
 
-            // VERIFICAÇOES DE VALORES
-            if (key === 'video_lvl' && item[key]) {
-                var a = document.createElement('a');
-                a.href = item[key];
-                a.textContent = item[key];
-                a.target = '_blank';
-                td.appendChild(a);
-            } else if (key === 'listpct_lvl') {
-                var value = td.textContent;
-                td.oninput = function() {
-                    if(isNaN(this.textContent) || this.textContent < 0 || this.textContent > 100)
-                    {
-                        this.textContent = value;
-                    }
-                    else
-                    {
-                        value = this.textContent;
-                    }
-                }
-                if (index <= mainListMaxPosition) {
-                    td.textContent = item[key];
-                } else if (index <= extendedListMaxPosition) {
-                    td.textContent = "";
-                }
-            } else {
-                td.textContent = item[key];
-            }
+            // deletar
+            var deleteButton = createDeleteButton(table, tr);
+            td.appendChild(deleteButton);
+
+            // atualizar
+            var refreshButton = createRefreshButton(tr);
+            td.appendChild(refreshButton);
+
+            // diminuir posição
+            var downButton = createDownButton(table, tr);
+            td.appendChild(downButton);
+
+            // aumentar posição
+            var upButton = createUpButton(table, tr);
+            td.appendChild(upButton);
+
             tr.appendChild(td);
+            tbody.appendChild(tr);
         });
-        var td = document.createElement('td');
-        td.style.textAlign = 'center';
-
-        // deletar
-        var deleteButton = createDeleteButton(table, tr);
-        td.appendChild(deleteButton);
-
-        // atualizar
-        var refreshButton = createRefreshButton(tr);
-        td.appendChild(refreshButton);
-
-        // diminuir posição
-        var downButton = createDownButton(table, tr);
-        td.appendChild(downButton);
-
-        // aumentar posição
-        var upButton = createUpButton(table, tr);
-        td.appendChild(upButton);
-
-        tr.appendChild(td);
-        tbody.appendChild(tr);
+        table.appendChild(tbody);
+        document.body.appendChild(table);
+        //adicionar na div table-container
+        var tableContainer = document.getElementById('table-container');
+        tableContainer.appendChild(table);
+        resolve();
     });
-    table.appendChild(tbody);
-    document.body.appendChild(table);
-    //adicionar na div table-container
-    var tableContainer = document.getElementById('table-container');
-    tableContainer.appendChild(table);
-    updateTable();
 }
 
 function DeletarLinhaLevelTable(table, rowIndex) {
