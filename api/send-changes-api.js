@@ -47,20 +47,6 @@ module.exports = async (req, res) =>
     const content = Buffer.from(changes).toString('base64');
     const branch = 'list-changes-commits';
 
-    // Obter a lista de pull requests
-    const { data: pullRequests } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls`, {
-        headers: {
-            'Authorization': `token ${token}`
-        }
-    });
-
-    // Verificar se algum pull request está aberto com o título "List Changes"
-    const openPullRequest = pullRequests.find(pr => pr.state === 'open' && pr.head.ref === branch && pr.title === 'List Changes');
-    if (openPullRequest) {
-        res.status(400).json({ message: 'Já existe um pull request aberto. Aguarde a revisão para criar um novo request.' });
-        return;
-    }
-
     // Deletar a branch 'list-changes-commits'
     await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
         headers: {

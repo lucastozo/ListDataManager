@@ -7,7 +7,20 @@ fetch('/data/listvalues.json')
     extendedListMaxPosition = data.Data[0].extendedList;
 });
 
-IniciarPlayerData();
+checkOpenPR(2).then(isOpen => {
+    if(isOpen) {
+        var confirmMessage = 'ATENÇÂO: Existem alterações pendentes na lista. Os dados atuais podem estar desatualizados.\n' +
+                            'Você não será capaz de enviar alterações até que essas alterações sejam fechadas.\n' +
+                            'É aconselhável contatar um administrador para solicitar a revisão das alterações.\n\n' +
+                            'Deseja continuar mesmo assim?';
+        if(!confirm(confirmMessage)) {
+            window.location.href = '/';
+            return;
+        }
+    }
+    IniciarPlayerData();
+});
+
 function IniciarPlayerData()
 {
     document.getElementById('overlay').style.display = 'flex';

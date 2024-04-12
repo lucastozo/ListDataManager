@@ -51,7 +51,7 @@ function sendLevelChanges()
     const json = ExportarLevel(document.getElementById('level-table'));
     const changes = JSON.stringify(json, null, 2);
 
-    fetchAPI(userKey, tokenHash, changelog, changes, dataMode);
+    sendChanges(userKey, tokenHash, changelog, changes, dataMode);
 }
 
 function sendRecordsChanges()
@@ -99,7 +99,20 @@ function sendRecordsChanges()
     const json = ExportarRecord(document.getElementById('player-table'));
     const changes = JSON.stringify(json, null, 2);
 
-    fetchAPI(userKey, tokenHash, changelog, changes, dataMode);
+    sendChanges(userKey, tokenHash, changelog, changes, dataMode);
+}
+
+function sendChanges(userKey, tokenHash, changelog, changes, dataMode)
+{
+    checkOpenPR(dataMode).then(isOpen => {
+        if(isOpen)
+        {
+            sendButtonHandler(1);
+            errorMsgHandler("Já existe um pull request aberto. Aguarde a revisão para criar um novo request.", 2);
+            return;
+        }
+        fetchAPI(userKey, tokenHash, changelog, changes, dataMode);
+    });
 }
 
 function fetchAPI(userKey, tokenHash, changelog, changes, dataMode)
