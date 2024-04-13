@@ -7,6 +7,7 @@ fetch('/data/listvalues.json')
     extendedListMaxPosition = data.Data[0].extendedList;
 });
 
+document.getElementById('overlay').style.display = 'flex';
 checkOpenPR(1).then(isOpen => {
     if(isOpen) {
         var confirmMessage = 'ATENÇÂO: Existem alterações pendentes na lista. Os dados atuais podem estar desatualizados.\n' +
@@ -19,11 +20,11 @@ checkOpenPR(1).then(isOpen => {
         }
     }
     IniciarLevelData();
+    document.getElementById('overlay').style.display = 'none';
 });
 
 function IniciarLevelData()
 {
-    document.getElementById('overlay').style.display = 'flex';
     fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json')
     .then(response => response.json())
     .then(data => 
@@ -33,7 +34,6 @@ function IniciarLevelData()
         BotoesManipuladoresLevel();
         GenerateLevelTable(jsonContent).then(() => {
             updateTable();
-            document.getElementById('overlay').style.display = 'none';
         });
     });
 }
