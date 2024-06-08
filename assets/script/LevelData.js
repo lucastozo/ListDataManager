@@ -7,6 +7,11 @@ fetch('/data/listvalues.json')
     extendedListMaxPosition = data.Data[0].extendedList;
 });
 
+let lista_og = [];
+let lista_atual = [];
+let lista_adicionados = [];
+let logs = [];
+
 document.getElementById('overlay').style.display = 'flex';
 checkOpenPR(1).then(isOpen => {
     if(isOpen) {
@@ -35,6 +40,8 @@ function IniciarLevelData()
         GenerateLevelTable(jsonContent).then(() => {
             updateTable();
         });
+
+        triggerListaOg(jsonContent);
     });
 }
 function updateTable() {
@@ -136,6 +143,8 @@ function updateTable() {
     getVerifiers();
 
     updateColor();
+
+    triggerListaAtual(); //atualizar lista_atual a cada mudança
 }
 
 function GenerateLevelTable(json) {
@@ -409,6 +418,7 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
     document.querySelector('#level-publisher').value = '';
     document.querySelector('#level-listpct').value = '';
     updateTable();
+    triggerAdicionados(name);
 
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
@@ -541,16 +551,25 @@ function createDownButton(table, tr) {
     downButton.setAttribute('data-bs-placement', 'top');
     downButton.setAttribute('title', 'Diminuir posição');
     downButton.onclick = function() {
-        if(tr.rowIndex < table.rows.length - 1)
+        if(tr.rowIndex >= extendedListMaxPosition)
         {
-            var linhaPosterior = table.rows[tr.rowIndex + 1];
-            var posicaoPosterior = linhaPosterior.cells[0].textContent;
-            linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
-            tr.cells[0].textContent = posicaoPosterior;
-            table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
-
-            updateTable();
+            return;
         }
+        var linhaPosterior = table.rows[tr.rowIndex + 1];
+        var posicaoPosterior = linhaPosterior.cells[0].textContent;
+        linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
+        tr.cells[0].textContent = posicaoPosterior;
+        table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
+
+        updateTable();
+
+        // triggerar deslocamento
+        var level = tr.cells[2].textContent;
+        var posicaoAnterior = posicaoOriginal(level, lista_og);
+        var novaPosicao = posicaoAtual(level, lista_atual);
+        var levelAntes = levelAnterior(level, lista_atual);
+        var levelDepois = levelPosterior(level, lista_atual);
+        triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAntes, levelDepois);
     }
     return downButton;
 }
@@ -566,16 +585,70 @@ function createUpButton(table, tr) {
     upButton.setAttribute('data-bs-placement', 'top');
     upButton.setAttribute('title', 'Aumentar posição');
     upButton.onclick = function() {
-        if(tr.rowIndex > 1)
+        if(tr.rowIndex <= 1)
         {
-            var linhaAnterior = table.rows[tr.rowIndex - 1];
-            var posicaoAnterior = linhaAnterior.cells[0].textContent;
-            linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
-            tr.cells[0].textContent = posicaoAnterior;
-            table.tBodies[0].insertBefore(tr, linhaAnterior);
-            
-            updateTable();
+            return;
         }
+        var linhaAnterior = table.rows[tr.rowIndex - 1];
+        var posicaoAnterior = linhaAnterior.cells[0].textContent;
+        linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
+        tr.cells[0].textContent = posicaoAnterior;
+        table.tBodies[0].insertBefore(tr, linhaAnterior);
+        
+        updateTable();
+
+        // triggerar deslocamento
+        var level = tr.cells[2].textContent;
+        var posicaoAnterior = posicaoOriginal(level, lista_og);
+        var novaPosicao = posicaoAtual(level, lista_atual);
+        var levelAntes = levelAnterior(level, lista_atual);
+        var levelDepois = levelPosterior(level, lista_atual);
+        triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAntes, levelDepois);
     }
     return upButton;
+}
+
+function triggerListaOg(jsonContent)
+{
+    lista_og = lista(jsonContent.Data);
+}
+
+function triggerListaAtual()
+{
+    lista_atual = lista(document.querySelector('#level-table'), true);
+}
+
+function triggerAdicionados(level)
+{
+    lista_adicionados.push(level);
+    triggerDeslocamento(level, null, posicaoAtual(level, lista_atual), null, null);
+}
+
+function triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior)
+{
+    // preciso verificar se o level deslocado foi adicionado ou não
+    var levelAdicionado = lista_adicionados.includes(level);
+    var levelExpulso = levelAdicionado ? lista_atual[extendedListMaxPosition] : null;
+
+    console.log('Nova posição: ' + novaPosicao);
+    // vou precisar saber o nome da fase, posição na lista_og, posição na lista_atual, qual o level anterior e qual o level posterior
+    var log = escrevaDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior, levelAdicionado, levelExpulso);
+
+    if(levelAdicionado) {
+        console.log(logs);
+        return;
+    }
+    
+    //preciso verificar se já existe um log para o level, se existir, eu removo o log antigo e adiciono o novo
+    var index = logs.findIndex(log => log.includes(level));
+    if(index != -1)
+    {
+         logs.splice(index, 1);
+    }
+    
+    if(log)
+    {
+        logs.push(log);
+    }
+    console.log(logs);
 }
