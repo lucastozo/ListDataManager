@@ -287,8 +287,20 @@ function BotoesManipuladoresLevel()
     sendButton.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Alterações';
     sendButton.className = 'btn btn-primary';
     sendButton.style.margin = '5px';
-    sendButton.setAttribute('data-bs-toggle', 'modal');
-    sendButton.setAttribute('data-bs-target', '#send-changes-modal');
+
+    sendButton.onclick = function() {
+        var check = checarTabelaPorSeguranca(document.querySelector('#level-table'));
+        if(!check)
+        {
+            alert('Algum campo está vazio ou preenchido incorretamente. Por favor, revise a tabela antes de enviar.\n\n' +
+                'Provavelmente, mas não necessariamente, o campo "List%" de algum level da main list não foi preenchido.');
+            return;
+        }
+
+        var myModal = new bootstrap.Modal(document.getElementById('send-changes-modal'));
+        myModal.show();
+    }
+
     buttonsManip.appendChild(sendButton);
 
     var refreshButton = document.createElement('button');
@@ -576,4 +588,25 @@ function createUpButton(table, tr) {
         updateTable();
     }
     return upButton;
+}
+
+function checarTabelaPorSeguranca(table)
+{
+    // todas as celulas 0,1,2,4,5 devem ser obrigatoriamente preenchidas, celula 7 deve ser preenchida se a posição for menor que mainListMaxPosition
+    for(var i = 1; i < table.rows.length; i++)
+    {
+        var row = table.rows[i];
+        var position = row.cells[0].textContent;
+        var id = row.cells[1].textContent;
+        var name = row.cells[2].textContent;
+        var creator = row.cells[3].textContent;
+        var verifier = row.cells[4].textContent;
+        var video = row.cells[5].textContent;
+        var listpct = row.cells[7].textContent;
+        if(position === '' || id === '' || name === '' || creator === '' || verifier === '' || video === '' || (position <= mainListMaxPosition && isNaN(listpct)))
+        {
+            return false;
+        }
+    }
+    return true;
 }
