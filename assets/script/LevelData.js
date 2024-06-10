@@ -631,20 +631,16 @@ function triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior,
     var levelExpulso = levelAdicionado ? lista_atual[extendedListMaxPosition] : null;
 
     console.log('Nova posição: ' + novaPosicao);
+    console.log('Level adicionado?: ' + levelAdicionado);
     // vou precisar saber o nome da fase, posição na lista_og, posição na lista_atual, qual o level anterior e qual o level posterior
     var log = escrevaDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior, levelAdicionado, levelExpulso);
-
-    if(levelAdicionado) {
-        console.log(logs);
-        return;
-    }
     
     //preciso verificar se já existe um log para o level, se existir, eu removo o log antigo e adiciono o novo
-    var index = logs.findIndex(log => log.includes(level));
-    if(index != -1)
-    {
-         logs.splice(index, 1);
-    }
+    var index = logs.findIndex(log => log.startsWith(level));
+if(index != -1)
+{
+    logs.splice(index, 1);
+}
     
     if(log)
     {

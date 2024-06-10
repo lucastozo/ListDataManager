@@ -106,13 +106,10 @@ function levelPosterior(level, lista_atual) {
 }
 
 function escrevaDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior, levelAdicionado = false, levelExpulso = null) {
-    if (posicaoAnterior === novaPosicao) {
-        return null;
-    }
+    if (posicaoAnterior === novaPosicao) { return null; }
 
     let log;
     
-
     if (!levelAdicionado) {
         let movimento = posicaoAnterior > novaPosicao ? 'subiu' : 'desceu';
         let posicao = novaPosicao > 1 ? `ficando entre ${levelAnterior} e ${levelPosterior}` : `ficando acima de ${levelPosterior}`;
@@ -121,4 +118,44 @@ function escrevaDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior,
         log = `${level} foi adicionado em #${novaPosicao}. Isso faz com que ${levelExpulso} saia da lista`;
     }
     return log;
+}
+
+/*
+0: "arcturus desceu de #2 para #3, ficando entre ORDINARY e Forsaken Hell"
+1: "Forsaken Hell subiu de #4 para #3, ficando entre ORDINARY e arcturus"
+
+apos essas duas operações, arcturus ficou em #4, portanto o log de arcturus deveria ser modificado já que forsaken hell subiu acima dele
+
+como fazer isso?
+
+após "ficando entre" eu posso verificar se os levels mencionados aparecem com startswith em algum indice do vetor logs, se sim, eu posso remover o log antigo e adicionar um novo log com os levels corretos.
+
+js algoritmo:
+1. verificar se o level mencionado no log aparece no vetor logs
+2. se sim, verificar se o level mencionado no log aparece no inicio do log
+3. se sim, remover o log antigo
+4. adicionar um novo log com os levels corretos
+*/
+function corrigirDeslocamentoPassado(vetorLogs, lista_atual, log)
+{
+    // pegar level mencionado apos "ficando entre "
+    var primeiroLevelMencionado = log.split("ficando entre ")[1].split(" e ")[0];
+    var segundoLevelMencionado = log.split("ficando entre ")[1].split(" e ")[1];
+
+    // verificar se o level mencionado no log aparece no vetor logs
+    for (var i = 0; i < vetorLogs.length; i++)
+    {
+        // verificar se o level mencionado no log aparece no inicio do log
+        if (vetorLogs[i].startsWith(primeiroLevelMencionado) || vetorLogs[i].startsWith(segundoLevelMencionado))
+        {
+            // buscar level mencionado na lista atual
+            var posicaoPrimeiroLevel = posicaoAtual(primeiroLevelMencionado, lista_atual);
+            var posicaoSegundoLevel = posicaoAtual(segundoLevelMencionado, lista_atual);
+            log = `${primeiroLevelMencionado} subiu de #${posicaoPrimeiroLevel} para #${posicaoSegundoLevel}, ficando entre ${levelAnterior(primeiroLevelMencionado, lista_atual)} e ${segundoLevelMencionado}`;
+            vetorLogs.splice(i, 1);
+            vetorLogs.push(log);
+            return vetorLogs;
+        }
+    }
+    return null;
 }
