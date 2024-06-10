@@ -541,16 +541,15 @@ function createDownButton(table, tr) {
     downButton.setAttribute('data-bs-placement', 'top');
     downButton.setAttribute('title', 'Diminuir posição');
     downButton.onclick = function() {
-        if(tr.rowIndex < table.rows.length - 1)
-        {
-            var linhaPosterior = table.rows[tr.rowIndex + 1];
-            var posicaoPosterior = linhaPosterior.cells[0].textContent;
-            linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
-            tr.cells[0].textContent = posicaoPosterior;
-            table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
+        if(tr.rowIndex >= extendedListMaxPosition) { return; }
 
-            updateTable();
-        }
+        var linhaPosterior = table.rows[tr.rowIndex + 1];
+        var posicaoPosterior = linhaPosterior.cells[0].textContent;
+        linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
+        tr.cells[0].textContent = posicaoPosterior;
+        table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
+
+        updateTable();
     }
     return downButton;
 }
@@ -566,16 +565,15 @@ function createUpButton(table, tr) {
     upButton.setAttribute('data-bs-placement', 'top');
     upButton.setAttribute('title', 'Aumentar posição');
     upButton.onclick = function() {
-        if(tr.rowIndex > 1)
-        {
-            var linhaAnterior = table.rows[tr.rowIndex - 1];
-            var posicaoAnterior = linhaAnterior.cells[0].textContent;
-            linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
-            tr.cells[0].textContent = posicaoAnterior;
-            table.tBodies[0].insertBefore(tr, linhaAnterior);
-            
-            updateTable();
-        }
+        if (tr.rowIndex <= 1) { return; }
+        
+        var linhaAnterior = table.rows[tr.rowIndex - 1];
+        var posicaoAnterior = linhaAnterior.cells[0].textContent;
+        linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
+        tr.cells[0].textContent = posicaoAnterior;
+        table.tBodies[0].insertBefore(tr, linhaAnterior);
+        
+        updateTable();
     }
     return upButton;
 }
