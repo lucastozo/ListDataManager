@@ -296,8 +296,20 @@ function BotoesManipuladoresLevel()
     sendButton.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Alterações';
     sendButton.className = 'btn btn-primary';
     sendButton.style.margin = '5px';
-    sendButton.setAttribute('data-bs-toggle', 'modal');
-    sendButton.setAttribute('data-bs-target', '#send-changes-modal');
+
+    sendButton.onclick = function() {
+        var check = checarTabelaPorSeguranca(document.querySelector('#level-table'));
+        if(!check)
+        {
+            alert('Algum campo está vazio ou preenchido incorretamente. Por favor, revise a tabela antes de enviar.\n\n' +
+                'Provavelmente, mas não necessariamente, o campo "List%" de algum level da main list não foi preenchido.');
+            return;
+        }
+
+        var myModal = new bootstrap.Modal(document.getElementById('send-changes-modal'));
+        myModal.show();
+    }
+
     buttonsManip.appendChild(sendButton);
 
     var refreshButton = document.createElement('button');
@@ -551,10 +563,8 @@ function createDownButton(table, tr) {
     downButton.setAttribute('data-bs-placement', 'top');
     downButton.setAttribute('title', 'Diminuir posição');
     downButton.onclick = function() {
-        if(tr.rowIndex >= extendedListMaxPosition)
-        {
-            return;
-        }
+        if(tr.rowIndex >= extendedListMaxPosition) { return; }
+
         var linhaPosterior = table.rows[tr.rowIndex + 1];
         var posicaoPosterior = linhaPosterior.cells[0].textContent;
         linhaPosterior.cells[0].textContent = tr.cells[0].textContent;
@@ -562,14 +572,6 @@ function createDownButton(table, tr) {
         table.tBodies[0].insertBefore(tr, linhaPosterior.nextSibling);
 
         updateTable();
-
-        // triggerar deslocamento
-        var level = tr.cells[2].textContent;
-        var posicaoAnterior = posicaoOriginal(level, lista_og);
-        var novaPosicao = posicaoAtual(level, lista_atual);
-        var levelAntes = levelAnterior(level, lista_atual);
-        var levelDepois = levelPosterior(level, lista_atual);
-        triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAntes, levelDepois);
     }
     return downButton;
 }
@@ -585,10 +587,8 @@ function createUpButton(table, tr) {
     upButton.setAttribute('data-bs-placement', 'top');
     upButton.setAttribute('title', 'Aumentar posição');
     upButton.onclick = function() {
-        if(tr.rowIndex <= 1)
-        {
-            return;
-        }
+        if (tr.rowIndex <= 1) { return; }
+        
         var linhaAnterior = table.rows[tr.rowIndex - 1];
         var posicaoAnterior = linhaAnterior.cells[0].textContent;
         linhaAnterior.cells[0].textContent = tr.cells[0].textContent;
@@ -596,55 +596,27 @@ function createUpButton(table, tr) {
         table.tBodies[0].insertBefore(tr, linhaAnterior);
         
         updateTable();
-
-        // triggerar deslocamento
-        var level = tr.cells[2].textContent;
-        var posicaoAnterior = posicaoOriginal(level, lista_og);
-        var novaPosicao = posicaoAtual(level, lista_atual);
-        var levelAntes = levelAnterior(level, lista_atual);
-        var levelDepois = levelPosterior(level, lista_atual);
-        triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAntes, levelDepois);
     }
     return upButton;
 }
 
-function triggerListaOg(jsonContent)
+function checarTabelaPorSeguranca(table)
 {
-    lista_og = lista(jsonContent.Data);
-}
-
-function triggerListaAtual()
-{
-    lista_atual = lista(document.querySelector('#level-table'), true);
-}
-
-function triggerAdicionados(level)
-{
-    lista_adicionados.push(level);
-    triggerDeslocamento(level, null, posicaoAtual(level, lista_atual), null, null);
-}
-
-function triggerDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior)
-{
-    // preciso verificar se o level deslocado foi adicionado ou não
-    var levelAdicionado = lista_adicionados.includes(level);
-    var levelExpulso = levelAdicionado ? lista_atual[extendedListMaxPosition] : null;
-
-    console.log('Nova posição: ' + novaPosicao);
-    console.log('Level adicionado?: ' + levelAdicionado);
-    // vou precisar saber o nome da fase, posição na lista_og, posição na lista_atual, qual o level anterior e qual o level posterior
-    var log = escrevaDeslocamento(level, posicaoAnterior, novaPosicao, levelAnterior, levelPosterior, levelAdicionado, levelExpulso);
-    
-    //preciso verificar se já existe um log para o level, se existir, eu removo o log antigo e adiciono o novo
-    var index = logs.findIndex(log => log.startsWith(level));
-if(index != -1)
-{
-    logs.splice(index, 1);
-}
-    
-    if(log)
+    // todas as celulas 0,1,2,4,5 devem ser obrigatoriamente preenchidas, celula 7 deve ser preenchida se a posição for menor que mainListMaxPosition
+    for(var i = 1; i < table.rows.length; i++)
     {
-        logs.push(log);
+        var row = table.rows[i];
+        var position = row.cells[0].textContent;
+        var id = row.cells[1].textContent;
+        var name = row.cells[2].textContent;
+        var creator = row.cells[3].textContent;
+        var verifier = row.cells[4].textContent;
+        var video = row.cells[5].textContent;
+        var listpct = row.cells[7].textContent;
+        if(position === '' || id === '' || name === '' || creator === '' || verifier === '' || video === '' || (position <= mainListMaxPosition && isNaN(listpct)))
+        {
+            return false;
+        }
     }
-    console.log(logs);
+    return true;
 }

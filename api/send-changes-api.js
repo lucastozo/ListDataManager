@@ -30,24 +30,26 @@ module.exports = async (req, res) =>
     const repo = 'DemonlistBR';
     let path;
     let message;
+    let branch;
     switch (dataMode)
     {
         case 1:
             path = 'data/leveldata.json';
             message = 'List Changes';
+            branch = 'list-changes-commits';
             break;
         case 2:
             path = 'data/playerdata.json';
             message = 'Records Changes';
+            branch = 'records-changes-commits';
             break;
         default:
             res.status(400).json({ message: 'Modo de dados inválido' });
             return;
     }
     const content = Buffer.from(changes).toString('base64');
-    const branch = 'list-changes-commits';
 
-    // Deletar a branch 'list-changes-commits'
+    // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
     await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
         headers: {
             'Authorization': `token ${token}`
@@ -61,7 +63,7 @@ module.exports = async (req, res) =>
         }
     });
 
-    // Criar a branch 'list-changes-commits' a partir do último commit da branch 'main'
+    // Criar a branch 'list-changes-commits' ou 'records-changes-commits' a partir do último commit da branch 'main'
     await axios.post(`https://api.github.com/repos/${owner}/${repo}/git/refs`, {
         ref: `refs/heads/${branch}`,
         sha: mainSha
