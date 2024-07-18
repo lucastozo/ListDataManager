@@ -49,27 +49,12 @@ module.exports = async (req, res) =>
     }
     const content = Buffer.from(changes).toString('base64');
 
-    try {
-        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/branches/${branch}`, {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
-
-        if (response.status === 200) {
-            // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
-            await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
-                headers: {
-                    'Authorization': `token ${token}`
-                }
-            });
+    // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
+    await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+        headers: {
+            'Authorization': `token ${token}`
         }
-    } catch (error) {
-        if (error.response.status !== 404) {
-            res.status(500).json({ message: 'Erro ao deletar a branch' });
-            return;
-        }
-    }
+    });
 
     // Obter o último commit da branch 'main'
     const { data: { object: { sha: mainSha } } } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`, {
