@@ -49,12 +49,22 @@ module.exports = async (req, res) =>
     }
     const content = Buffer.from(changes).toString('base64');
 
-    // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
-    await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
-        headers: {
-            'Authorization': `token ${token}`
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/branches/${branch}`, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
+
+        if (response.status === 200) {
+            // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
+            await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            });
         }
-    });
+    } catch (e) {}
 
     // Obter o último commit da branch 'main'
     const { data: { object: { sha: mainSha } } } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`, {
@@ -105,7 +115,7 @@ module.exports = async (req, res) =>
             return;
     }
     const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
-    const head = 'list-changes-commits';
+    let head; dataMode === 1 ? head = 'list-changes-commits' : head = 'records-changes-commits';
     const base = 'main';
     const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
   
