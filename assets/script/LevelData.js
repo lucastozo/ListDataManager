@@ -7,11 +7,6 @@ fetch('/data/listvalues.json')
     extendedListMaxPosition = data.Data[0].extendedList;
 });
 
-let lista_og = [];
-let lista_atual = [];
-let lista_adicionados = [];
-let logs = [];
-
 document.getElementById('overlay').style.display = 'flex';
 checkOpenPR(1).then(isOpen => {
     if(isOpen) {
@@ -40,8 +35,6 @@ function IniciarLevelData()
         GenerateLevelTable(jsonContent).then(() => {
             updateTable();
         });
-
-        triggerListaOg(jsonContent);
     });
 }
 function updateTable() {
@@ -143,8 +136,6 @@ function updateTable() {
     getVerifiers();
 
     updateColor();
-
-    triggerListaAtual(); //atualizar lista_atual a cada mudança
 }
 
 function GenerateLevelTable(json) {
@@ -430,7 +421,6 @@ async function AdicionarLevel(position, id, name, creator, verifier, video, publ
     document.querySelector('#level-publisher').value = '';
     document.querySelector('#level-listpct').value = '';
     updateTable();
-    triggerAdicionados(name);
 
     var modal = document.querySelector('#addLevel-modal');
     var modalBS = bootstrap.Modal.getInstance(modal);
