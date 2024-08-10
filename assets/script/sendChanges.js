@@ -15,15 +15,10 @@ function sendLevelChanges()
     //exportar tabela para json
     function ExportarLevel(table)
     {
-        var date = new Date();
-        var day = date.getDate();
-        var month = date.getMonth() + 1; //January is 0
-        var year = date.getFullYear();
-        var hour = date.getHours();
-        var minute = date.getMinutes();
-        var second = date.getSeconds();
-        var generatedAt = day + '/' + month + '/' + year + ' ' + hour + ':' + minute + ':' + second;
-        var json = {GeradoEm: generatedAt, TipoData: "level", Data: []};
+        var lastEditor = userKey.split('@')[0];
+        var horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+        var json = {UltimoEditor: lastEditor, GeradoEm: horario, TipoData: "level", Data: []};
         for(var i = 1; i < table.rows.length; i++)
         {
             var level = {};
@@ -71,15 +66,10 @@ function sendRecordsChanges()
     //exportar tabela para json
     function ExportarRecord(table)
     {
-        var date = new Date();
-        var day = date.getDate();
-        var month = date.getMonth() + 1; //January is 0
-        var year = date.getFullYear();
-        var hour = date.getHours();
-        var minute = date.getMinutes();
-        var second = date.getSeconds();
-        var generatedAt = day + '/' + month + '/' + year + ' ' + hour + ':' + minute + ':' + second;
-        var json = {GeradoEm: generatedAt, TipoData: "record", Data: []};
+        var lastEditor = userKey.split('@')[0];
+        var horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+        var json = {UltimoEditor: lastEditor, GeradoEm: horario, TipoData: "record", Data: []};
         for(var i = 1; i < table.rows.length; i++)
         {
             var record = {};
