@@ -8,6 +8,8 @@ module.exports = async (req, res) =>
     // changes: JSON
     // dataMode: 1 = level, 2 = records
 
+    const REQUIRE_PULL_REQUEST = false;
+
     const adminData = process.env.USERS_KEYS;
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
     const hash = process.env.DLBR_AUTO_HASH_TOKEN;
@@ -30,58 +32,62 @@ module.exports = async (req, res) =>
     const repo = 'DemonlistBR';
     let path;
     let message;
-    let branch;
+    let branch; //
     switch (dataMode)
     {
         case 1:
             path = 'data/leveldata.json';
             message = 'List Changes';
-            branch = 'list-changes-commits';
+            branch = 'list-changes-commits'; //
             break;
         case 2:
             path = 'data/playerdata.json';
             message = 'Records Changes';
-            branch = 'records-changes-commits';
+            branch = 'records-changes-commits'; //
             break;
         default:
             res.status(400).json({ message: 'Modo de dados inválido' });
             return;
     }
+    if (!REQUIRE_PULL_REQUEST) branch = 'main';
     const content = Buffer.from(changes).toString('base64');
 
-    try {
-        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/branches/${branch}`, {
-            headers: {
-                'Authorization': `token ${token}`
-            }
-        });
-
-        if (response.status === 200) {
-            // Deletar a branch 'list-changes-commits' ou 'records-changes-commits' se ela existir
-            await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+    if (REQUIRE_PULL_REQUEST) {
+        try {
+            const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/branches/${branch}`, {
                 headers: {
                     'Authorization': `token ${token}`
                 }
             });
-        }
-    } catch (e) {}
 
-    // Obter o último commit da branch 'main'
+            if (response.status === 200) {
+                // delete branchs
+                await axios.delete(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`, {
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                });
+            }
+        } catch (e) {}
+    }
+
+    // último commit da main
     const { data: { object: { sha: mainSha } } } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/main`, {
         headers: {
             'Authorization': `token ${token}`
         }
     });
 
-    // Criar a branch 'list-changes-commits' ou 'records-changes-commits' a partir do último commit da branch 'main'
-    await axios.post(`https://api.github.com/repos/${owner}/${repo}/git/refs`, {
-        ref: `refs/heads/${branch}`,
-        sha: mainSha
-    }, {
-        headers: {
-            'Authorization': `token ${token}`
-        }
-    });
+    if (REQUIRE_PULL_REQUEST) { // Criar a branch
+        await axios.post(`https://api.github.com/repos/${owner}/${repo}/git/refs`, {
+            ref: `refs/heads/${branch}`,
+            sha: mainSha
+        }, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
+    }
 
     const fileResponse = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
         headers: {
@@ -100,34 +106,38 @@ module.exports = async (req, res) =>
         }
     });
     
-    const horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    let title;
-    switch (dataMode)
-    {
-        case 1:
-            title = 'List Changes';
-            break;
-        case 2:
-            title = 'Records Changes';
-            break;
-        default:
-            res.status(400).json({ message: 'Modo de dados inválido' });
-            return;
-    }
-    const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
-    let head; dataMode === 1 ? head = 'list-changes-commits' : head = 'records-changes-commits';
-    const base = 'main';
-    const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
-  
-    const prResponse = await axios.post(url, {
-        title,
-        body: bodyPR,
-        head,
-        base
-    }, {
-        headers: {
-            'Authorization': `token ${token}`
+    if (REQUIRE_PULL_REQUEST) {
+        const horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        let title;
+        switch (dataMode)
+        {
+            case 1:
+                title = 'List Changes';
+                break;
+            case 2:
+                title = 'Records Changes';
+                break;
+            default:
+                res.status(400).json({ message: 'Modo de dados inválido' });
+                return;
         }
-    });
-    res.json(prResponse.data);
+        const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
+        let head; dataMode === 1 ? head = 'list-changes-commits' : head = 'records-changes-commits';
+        const base = 'main';
+        const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
+    
+        const prResponse = await axios.post(url, {
+            title,
+            body: bodyPR,
+            head,
+            base
+        }, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
+        res.json(prResponse.data);
+    } else {
+        res.json(updateResponse.data);
+    }
 }
