@@ -20,7 +20,6 @@ checkOpenPR(1).then(isOpen => {
         }
     }
     IniciarLevelData();
-    document.getElementById('overlay').style.display = 'none';
 });
 
 function IniciarLevelData()
@@ -35,6 +34,7 @@ function IniciarLevelData()
         GenerateLevelTable(jsonContent).then(() => {
             updateTable();
         });
+        document.getElementById('overlay').style.display = 'none';
     });
 }
 function updateTable() {

@@ -20,7 +20,6 @@ checkOpenPR(2).then(isOpen => {
         }
     }
     IniciarPlayerData();
-    document.getElementById('overlay').style.display = 'none';
 });
 
 function IniciarPlayerData()
@@ -34,6 +33,7 @@ function IniciarPlayerData()
         BotoesManipuladoresRecord();
         GeneratePlayerTable(jsonContent);
     });
+    document.getElementById('overlay').style.display = 'none';
 }
 
 function GeneratePlayerTable(json) {
