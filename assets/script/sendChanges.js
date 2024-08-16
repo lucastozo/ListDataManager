@@ -73,7 +73,7 @@ function sendRecordsChanges()
         for(var i = 1; i < table.rows.length; i++)
         {
             var record = {};
-            record.level_name = table.rows[i].cells[1].textContent;
+            record.id_lvl = table.rows[i].cells[0].textContent;
             record.player_name = table.rows[i].cells[2].textContent;
             record.progress = parseInt(table.rows[i].cells[3].textContent);
             var video = table.rows[i].cells[4].textContent;

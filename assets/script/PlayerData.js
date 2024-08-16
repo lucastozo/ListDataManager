@@ -22,22 +22,38 @@ checkOpenPR(2).then(isOpen => {
     IniciarPlayerData();
 });
 
-function IniciarPlayerData()
+async function IniciarPlayerData()
 {
-    fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/playerdata.json')
-    .then(response => response.json())
-    .then(data => 
-    {
-        var decodedContent = atob(data.content);
-        var jsonContent = JSON.parse(decodedContent);
-        BotoesManipuladoresRecord();
-        GeneratePlayerTable(jsonContent);
+    const response = await fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/playerdata.json');
+    const data = await response.json();
+    const decodedContent = atob(data.content);
+    const jsonContent = JSON.parse(decodedContent);
+
+    await getNameLevelFromId(jsonContent);
+    BotoesManipuladoresRecord();
+    GeneratePlayerTable(jsonContent);
+}
+
+async function getNameLevelFromId(jsonPlayerData) {
+    const response = await fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json');
+    const data = await response.json();
+    const decodedContent = atob(data.content);
+    const jsonLevelData = JSON.parse(decodedContent);
+
+    jsonPlayerData.Data.forEach(function(item) {
+        const level = jsonLevelData.Data.find(function(element) {
+            if (element.id_lvl === item.id_lvl) {
+                // gerar um atributo name_lvl no jsonPlayerData para cada item e preencher com o nome do level
+                item.name_lvl = element.name_lvl;
+                return element;
+            }
+        });
     });
 }
 
 function GeneratePlayerTable(json) {
     json.Data.sort(function(a, b) {
-        return a.level_name.localeCompare(b.level_name);
+        return a.name_lvl.localeCompare(b.name_lvl);
     });
 
     var table = document.createElement('table');
@@ -46,7 +62,7 @@ function GeneratePlayerTable(json) {
 
     var thead = document.createElement('thead');
     var tr = document.createElement('tr');
-    ['', 'Level', 'Player', 'Progresso', 'Vídeo', 'Ações'].forEach(function(header) {
+    ['ID', 'Level', 'Player', 'Progresso', 'Vídeo', 'Ações'].forEach(function(header) {
         var th = document.createElement('th');
         th.scope = 'col';
         th.style.textAlign = 'center';
@@ -63,9 +79,8 @@ function GeneratePlayerTable(json) {
         th.scope = 'row';
         th.textContent = item.position_lvl;
         th.style.textAlign = 'center';
-        tr.appendChild(th);
 
-        ['level_name', 'player_name', 'progress', 'video'].forEach(function(key) {
+        ['id_lvl', 'name_lvl', 'player_name', 'progress', 'video'].forEach(function(key) {
             var td = document.createElement('td');
             td.style.textAlign = 'center';
             if (key === 'video' && item[key]) {
@@ -77,7 +92,7 @@ function GeneratePlayerTable(json) {
             } else {
                 td.textContent = item[key];
             }
-            td.contentEditable = key !== 'level_name';
+            td.contentEditable = (key !== 'id_lvl') && (key !== 'name_lvl');
             td.spellcheck = false;
             //ignorar valores não numéricos para listpct
             if(key === 'progress')
@@ -175,12 +190,13 @@ function BotoesManipuladoresRecord()
     addButton.setAttribute('data-bs-target', '#addRecord-modal');
     buttonsManip.appendChild(addButton);
     var addRecordButton  = document.querySelector('#addRecord');
-    addRecordButton.onclick = function() {
+    addRecordButton.onclick = async function() {
+        var id = document.querySelector('#level-id-record').value;
         var level = document.querySelector('#level').value;
         var player = document.querySelector('#player-name').value;
         var progress = document.querySelector('#progress').value;
         var video = document.querySelector('#video').value;
-        AdicionarRecord(level, player, progress, video);
+        AdicionarRecord(id, level, player, progress, video);
     }
 
     var sendButton = document.createElement('button');
@@ -193,7 +209,7 @@ function BotoesManipuladoresRecord()
     buttonsManip.appendChild(sendButton);
 }
 
-function AdicionarRecord(level, player, progress, video)
+function AdicionarRecord(id, level, player, progress, video)
 {
     if(level === "" || player === "" || progress === "")
     {
@@ -232,22 +248,24 @@ function AdicionarRecord(level, player, progress, video)
                 alert("Progresso inválido ou menor que list% (" + listpctLevel + ")!");
                 return;
             }
-            insertRecord(level, player, progress, video);
+            insertRecord(id, level, player, progress, video);
         } else {
             alert("Level não encontrado!");
             return;
         }
     });
 
-    function insertRecord(level, player, progress, video)
+    function insertRecord(id, level, player, progress, video)
     {
         var table = document.querySelector('#player-table');
         var newRow = table.insertRow(1);
-        newRow.insertCell();
-        newRow.spellcheck = false;
+        //newRow.spellcheck = false;
+        var idCell = newRow.insertCell();
+        idCell.textContent = id;
+        idCell.contentEditable = false;
         var levelCell = newRow.insertCell();
         levelCell.textContent = level;
-        levelCell.contentEditable = true;
+        levelCell.contentEditable = false;
         var playerCell = newRow.insertCell();
         playerCell.textContent = player;
         playerCell.contentEditable = true;
