@@ -33,7 +33,6 @@ function IniciarPlayerData()
         BotoesManipuladoresRecord();
         GeneratePlayerTable(jsonContent);
     });
-    document.getElementById('overlay').style.display = 'none';
 }
 
 function GeneratePlayerTable(json) {
@@ -144,6 +143,7 @@ function GeneratePlayerTable(json) {
         }
     }
     getPlayers();
+    document.getElementById('overlay').style.display = 'none';
 }
 
 function DeletarLinhaPlayerTable(tr) {

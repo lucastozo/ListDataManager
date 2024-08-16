@@ -24,6 +24,9 @@ module.exports = async (req, res) =>
         case 2:
             title = 'Records Changes';
             break;
+        case 3:
+            title = 'Ignored Names Changes';
+            break;
         default:
             res.status(400).json({ message: 'Modo de dados inválido' });
             return;

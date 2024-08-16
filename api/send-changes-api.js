@@ -45,6 +45,11 @@ module.exports = async (req, res) =>
             message = 'Records Changes';
             branch = 'records-changes-commits'; //
             break;
+        case 3:
+            path = 'data/ignoredNames.txt';
+            message = 'Ignored Names Changes';
+            branch = 'ignored-names-commits'; //
+            break;
         default:
             res.status(400).json({ message: 'Modo de dados inválido' });
             return;
@@ -109,20 +114,26 @@ module.exports = async (req, res) =>
     if (REQUIRE_PULL_REQUEST) {
         const horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         let title;
+        let head;
         switch (dataMode)
         {
             case 1:
                 title = 'List Changes';
+                head = 'list-changes-commits';
                 break;
             case 2:
                 title = 'Records Changes';
+                head = 'records-changes-commits';
+                break;
+            case 3:
+                title = 'Ignored Names Changes';
+                head = 'ignored-names-commits';
                 break;
             default:
                 res.status(400).json({ message: 'Modo de dados inválido' });
                 return;
         }
         const bodyPR = `Gerado automaticamente por DLBRauto em ${horario} (SP).\nAlterações feitas por: ${userName}\n\n${changelog}`;
-        let head; dataMode === 1 ? head = 'list-changes-commits' : head = 'records-changes-commits';
         const base = 'main';
         const url = `https://api.github.com/repos/${owner}/${repo}/pulls`;
     

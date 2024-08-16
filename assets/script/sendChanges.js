@@ -92,6 +92,33 @@ function sendRecordsChanges()
     sendChanges(userKey, tokenHash, changelog, changes, dataMode);
 }
 
+function sendIgnoredNamesChanges()
+{
+    errorMsgHandler('', 1);
+    sendButtonHandler(2);
+    const userKey = document.querySelector('#ignoredNames-pr-user-key').value;
+    const tokenHash = document.querySelector('#ignoredNames-pr-token').value;
+    const changelog = document.querySelector('#ignoredNames-pr-changelog').value;
+    const dataMode = 3;
+
+    if(!checkInputs(userKey, tokenHash, changelog)) return;
+
+    function ExportarNomes(ignoredNamesDiv)
+    {
+        const firstLine = "NOMES A SEREM IGNORADOS DO RANKING (não brasileiros), separe por enter";
+        var ignoredNames = firstLine + '\n';
+        var inputs = ignoredNamesDiv.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.value.trim() !== '' && !/^\s+$/.test(input.value)) { // ignore empty lines or lines with only spaces
+                ignoredNames += input.value + '\n';
+            }
+        });
+        return ignoredNames;
+    }
+    const ignoredNamesTxt = ExportarNomes(document.getElementById('ignored-names-div'));
+    sendChanges(userKey, tokenHash, changelog, ignoredNamesTxt, dataMode);
+}
+
 function sendChanges(userKey, tokenHash, changelog, changes, dataMode)
 {
     checkOpenPR(dataMode).then(isOpen => {
