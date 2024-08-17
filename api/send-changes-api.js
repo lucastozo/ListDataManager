@@ -8,7 +8,7 @@ module.exports = async (req, res) =>
     // changes: JSON
     // dataMode: 1 = level, 2 = records
 
-    const REQUIRE_PULL_REQUEST = false;
+    const REQUIRE_PULL_REQUEST = true;
 
     const adminData = process.env.USERS_KEYS;
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
