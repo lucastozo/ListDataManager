@@ -7,6 +7,8 @@ fetch('/data/listvalues.json')
     extendedListMaxPosition = data.Data[0].extendedList;
 });
 
+let ogTable;
+
 document.getElementById('overlay').style.display = 'flex';
 checkOpenPR(1).then(isOpen => {
     if(isOpen) {
@@ -35,6 +37,8 @@ function IniciarLevelData()
             updateTable();
         });
         document.getElementById('overlay').style.display = 'none';
+
+        ogTable = JSON.parse(JSON.stringify(jsonContent)); // use because of showDiffBetweenOldAndUpdatedTable()
     });
 }
 function updateTable() {
@@ -609,4 +613,52 @@ function checarTabelaPorSeguranca(table)
         }
     }
     return true;
+}
+
+function showDiffBetweenOldAndUpdatedTable() // use in console to check the difference between the og table and table after RefreshAll()
+{
+    var currentTable = ExportarLevel(document.querySelector('#level-table'));
+    function ExportarLevel(table)
+    {
+        var lastEditor = ogTable.UltimoEditor;
+        var horario = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+        var json = {UltimoEditor: lastEditor, GeradoEm: horario, TipoData: "level", Data: []};
+        for(var i = 1; i < table.rows.length; i++)
+        {
+            var level = {};
+            level.position_lvl = parseInt(table.rows[i].cells[0].textContent);
+            level.id_lvl = table.rows[i].cells[1].textContent;
+            level.name_lvl = table.rows[i].cells[2].textContent;
+            level.creator_lvl = table.rows[i].cells[3].textContent;
+            level.verifier_lvl = table.rows[i].cells[4].textContent;
+            level.video_lvl = table.rows[i].cells[5].textContent;
+            var publisher = table.rows[i].cells[6].textContent;
+            if(publisher && publisher.trim() !== '') level.publisher_lvl = publisher;
+            var listpct = table.rows[i].cells[7].textContent;
+            if(!isNaN(listpct) && listpct.trim() !== '' && listpct >= 0 && listpct <= 100 && listpct !== 'preencher!') level.listpct_lvl = parseInt(listpct);
+            json.Data.push(level);
+        }
+        return json;
+    }
+
+    function compareIfDifferent(ogLevel, currentLevel) {
+        if(ogLevel.id_lvl !== currentLevel.id_lvl || ogLevel.name_lvl !== currentLevel.name_lvl || ogLevel.creator_lvl !== currentLevel.creator_lvl || ogLevel.verifier_lvl !== currentLevel.verifier_lvl || ogLevel.video_lvl !== currentLevel.video_lvl || ogLevel.publisher_lvl !== currentLevel.publisher_lvl || ogLevel.listpct_lvl !== currentLevel.listpct_lvl) {
+            return true;
+        }
+        return false;
+    }
+
+    var diff = [];
+    for(var i = 0; i < ogTable.Data.length; i++)
+    {
+        var ogLevel = ogTable.Data[i];
+        var currentLevel = currentTable.Data[i];
+        if(compareIfDifferent(ogLevel, currentLevel))
+        {
+            diff.push({position: ogLevel.position_lvl, id: ogLevel.id_lvl, name: ogLevel.name_lvl, creator: ogLevel.creator_lvl, verifier: ogLevel.verifier_lvl, video: ogLevel.video_lvl, publisher: ogLevel.publisher_lvl, listpct: ogLevel.listpct_lvl});
+            diff.push({position: currentLevel.position_lvl, id: currentLevel.id_lvl, name: currentLevel.name_lvl, creator: currentLevel.creator_lvl, verifier: currentLevel.verifier_lvl, video: currentLevel.video_lvl, publisher: currentLevel.publisher_lvl, listpct: currentLevel.listpct_lvl});
+        }
+    }
+    console.log(diff);
 }
