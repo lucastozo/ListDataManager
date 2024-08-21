@@ -1,11 +1,4 @@
-let mainListMaxPosition
-let extendedListMaxPosition
-fetch('/data/listvalues.json')
-.then(response => response.json())
-.then(data => {
-    mainListMaxPosition = data.Data[0].mainList;
-    extendedListMaxPosition = data.Data[0].extendedList;
-});
+let mainListMaxPosition, extendedListMaxPosition;
 
 document.getElementById('overlay').style.display = 'flex';
 checkOpenPR(2).then(isOpen => {
@@ -24,6 +17,10 @@ checkOpenPR(2).then(isOpen => {
 
 async function IniciarPlayerData()
 {
+    const listSettingsValues = await getListSettingsValues();
+    mainListMaxPosition = listSettingsValues.mainList;
+    extendedListMaxPosition = listSettingsValues.extendedList;
+    
     const response = await fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/playerdata.json');
     const data = await response.json();
     const decodedContent = atob(data.content);

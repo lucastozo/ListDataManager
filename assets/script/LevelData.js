@@ -1,11 +1,4 @@
-let mainListMaxPosition;
-let extendedListMaxPosition;
-fetch('/data/listvalues.json')
-.then(response => response.json())
-.then((data) => {
-    mainListMaxPosition = data.Data[0].mainList;
-    extendedListMaxPosition = data.Data[0].extendedList;
-});
+let mainListMaxPosition, extendedListMaxPosition;
 
 let ogTable;
 
@@ -24,23 +17,24 @@ checkOpenPR(1).then(isOpen => {
     IniciarLevelData();
 });
 
-function IniciarLevelData()
-{
-    fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json')
-    .then(response => response.json())
-    .then(data => 
-    {
-        var decodedContent = atob(data.content);
-        var jsonContent = JSON.parse(decodedContent);
-        BotoesManipuladoresLevel();
-        GenerateLevelTable(jsonContent).then(() => {
-            updateTable();
-        });
-        document.getElementById('overlay').style.display = 'none';
+async function IniciarLevelData() {
+    const listSettingsValues = await getListSettingsValues();
+    mainListMaxPosition = listSettingsValues.mainList;
+    extendedListMaxPosition = listSettingsValues.extendedList;
 
-        ogTable = JSON.parse(JSON.stringify(jsonContent)); // use because of showDiffBetweenOldAndUpdatedTable()
-    });
+    const response = await fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json');
+    const data = await response.json();
+    const decodedContent = atob(data.content);
+    const jsonContent = JSON.parse(decodedContent);
+
+    BotoesManipuladoresLevel();
+    await GenerateLevelTable(jsonContent);
+    updateTable();
+    document.getElementById('overlay').style.display = 'none';
+
+    ogTable = JSON.parse(JSON.stringify(jsonContent)); // use because of showDiffBetweenOldAndUpdatedTable()
 }
+
 function updateTable() {
     var table = document.querySelector('#level-table');
 
