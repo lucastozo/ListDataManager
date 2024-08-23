@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
         level_requests_json.push(struct);
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
-        return res.status(200).json({ message: updatedContent });
+        return res.status(200).json({ message: "START \n" + updatedContent + "\nEND" });
 
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error' });
