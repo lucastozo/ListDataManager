@@ -26,5 +26,12 @@
     "creator_lvl": "creator",
     "verifier_lvl": "verifier",
     "video_lvl": "video"
+  },
+  {
+    "id_lvl": "level",
+    "name_lvl": "level",
+    "creator_lvl": "creator",
+    "verifier_lvl": "verifier",
+    "video_lvl": "video"
   }
 ]
