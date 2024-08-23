@@ -37,6 +37,26 @@
 }
 */
 
+// object for array of objects:
+/*
+[
+    {
+        "id_lvl": "level id",
+        "name_lvl": "level name",
+        "creator_lvl": "creator name",
+        "verifier_lvl": "verifier name",
+        "video_lvl": "video link"
+    },
+    {
+        "id_lvl": "level id",
+        "name_lvl": "level name",
+        "creator_lvl": "creator name",
+        "verifier_lvl": "verifier name",
+        "video_lvl": "video link"
+    }
+]
+*/
+
 const axios = require('axios');
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,19 +71,7 @@ module.exports = async (req, res) => {
     if (!API_KEY || (API_KEY !== process.env.REQUEST_API_KEY)) return res.status(403).json({ message: 'Unauthorized' });
     if (!object || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing object or invalid dataMode' });
-
-    /*
-    const isJSON = (str) => {
-        try {
-            JSON.parse(str);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-    if (CALLING_METHOD === 'PUT' && isJSON(object)) return res.status(400).json({ message: 'Bad Request: Should not send JSON object for PUT method' });
-    if (CALLING_METHOD === 'POST' && !isJSON(object)) return res.status(400).json({ message: 'Bad Request: Should send JSON object for POST method' });
-    */
+    
     const isArrayOfObjects = (arr) => {
         if (!Array.isArray(arr)) return false;
         for (let i = 0; i < arr.length; i++) {
