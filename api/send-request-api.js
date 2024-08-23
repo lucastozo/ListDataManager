@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
     const apiKey = req.headers['authorization']
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
-    if (apiKey !== process.env.REQUEST_API_KEY) return res.status(403).json({ message: 'Unauthorized' });
+    if (!apiKey || (apiKey !== process.env.REQUEST_API_KEY)) return res.status(403).json({ message: 'Unauthorized' });
     if (!struct || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing struct or invalid dataMode' });
 
