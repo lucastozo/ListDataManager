@@ -8,11 +8,12 @@
 
 const axios = require('axios');
 module.exports = async (req, res) => {
+    console.log(req.body);
     //res.setHeader('Access-Control-Allow-Origin', '*');
     //res.setHeader('Access-Control-Allow-Methods', 'POST');
     //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    const { struct } = req.body;
+    const { struct } = req.body || {};
     //const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
     /*
@@ -20,6 +21,10 @@ module.exports = async (req, res) => {
         return res.status(403).json({ message: 'Unauthorized' });
     }
     */
+
+    if (!struct) {
+        return res.status(400).json({ message: 'Bad Request: Missing struct or apiKey' });
+    }
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
