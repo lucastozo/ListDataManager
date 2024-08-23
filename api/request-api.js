@@ -13,13 +13,13 @@
     "name_lvl": "level name",
     "creator_lvl": "creator name",
     "verifier_lvl": "verifier name",
-    "video_lvl": "video link",
+    "video_lvl": "video link"
 }
 */
 
 const axios = require('axios');
 module.exports = async (req, res) => {
-    console.log(req.body);
+    console.log(req.body + "\n");
     //res.setHeader('Access-Control-Allow-Origin', '*');
     //res.setHeader('Access-Control-Allow-Methods', 'POST');
     //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -48,10 +48,12 @@ module.exports = async (req, res) => {
         level_requests_json = JSON.parse(content);
         if(!Array.isArray(level_requests_json)) level_requests_json = [];
 
+        console.log("JSON BEFORE PUSH: \n");
         console.log(level_requests_json);
 
         level_requests_json.push(struct);
-        console.log("PASSOU NO PUSH");
+        console.log("JSON AFTER PUSH: \n");
+        console.log(level_requests_json);
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
         return res.status(200).json({ message: updatedContent });
