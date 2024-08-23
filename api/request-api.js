@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
                 'Authorization': `token ${token}`
             }
         });
-        const content = Buffer.from(response.data.content, 'base64').toString();
+        const content = Buffer.from(fileData.content, 'base64').toString();
         level_requests_json = JSON.parse(content);
         if(!Array.isArray(level_requests_json)) level_requests_json = [];
 
