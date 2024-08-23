@@ -70,6 +70,7 @@ module.exports = async (req, res) => {
         return res.status(200).json({ message: "Level request sent successfully" });
     } catch (error) {
         //console.error("Erro ao processar a requisição:", error);
+        console.log("\n" + error)
         return res.status(500).json({ message: error.message });
     }
 };
