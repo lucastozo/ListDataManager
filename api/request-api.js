@@ -84,12 +84,14 @@ module.exports = async (req, res) => {
     let updatedContent;
     
     try {
+        let fileData;
         if (CALLING_METHOD === 'PUT') { // Send request
-            const { data: fileData } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+            const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
                 headers: {
                     'Authorization': `token ${TOKEN}`
                 }
             });
+            fileData = data;
             const content = Buffer.from(fileData.content, 'base64').toString();
             let requests_json = JSON.parse(content);
             if(!Array.isArray(requests_json)) requests_json = [];
@@ -114,7 +116,7 @@ module.exports = async (req, res) => {
         });
         return res.status(200).json({ message: 'Success' });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 }
