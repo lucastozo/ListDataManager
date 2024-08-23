@@ -10,7 +10,7 @@
 // struct for level request:
 /*
 {
-    "id_lvl": "level name",
+    "id_lvl": "level id",
     "name_lvl": "level name",
     "creator_lvl": "creator name",
     "verifier_lvl": "verifier name",
@@ -18,17 +18,28 @@
 }
 */
 
+// struct for record request:
+/*
+{
+    "id_lvl": "level id",
+    "name_lvl": "level name",
+    "player_name": "player name",
+    "progress": 100,
+    "video": "video link"
+}
+*/
+
 const axios = require('axios');
 module.exports = async (req, res) => {
-    //res.setHeader('Access-Control-Allow-Origin', '*');
-    //res.setHeader('Access-Control-Allow-Methods', 'POST');
-    //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const { struct, dataMode } = req.body || {};
-    //const apiKey = req.headers['authorization']
+    const apiKey = req.headers['authorization']
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
-    // if(apiKey !== process.env.REQUEST_API_KEY) return res.status(403).json({ message: 'Unauthorized' });
+    if (apiKey !== process.env.REQUEST_API_KEY) return res.status(403).json({ message: 'Unauthorized' });
     if (!struct || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing struct or invalid dataMode' });
 
