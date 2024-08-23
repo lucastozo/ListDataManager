@@ -36,8 +36,10 @@ module.exports = async (req, res) => {
         console.log("PASSOU NO GET DO GITHUB");
         const content = Buffer.from(response.data.content, 'base64').toString();
         console.log("PASSOU NO BUFFER");
+        console.log(content);
         level_requests_json = JSON.parse(content);
         console.log("PASSOU NO PARSE");
+        console.log(level_requests_json);
 
         level_requests_json.push(struct);
         console.log("PASSOU NO PUSH");
