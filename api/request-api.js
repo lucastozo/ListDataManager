@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
     };
     const isGivenObjectAnArray = isArrayOfObjects(object);
     if (CALLING_METHOD === 'PUT' && isGivenObjectAnArray) return res.status(400).json({ message: 'Bad Request: Should not send array of objects for PUT method' });
-    if (CALLING_METHOD === 'POST' && isGivenObjectAnArray) return res.status(400).json({ message: 'Bad Request: Should send array of objects for POST method' });
+    if (CALLING_METHOD === 'POST' && !isGivenObjectAnArray) return res.status(400).json({ message: 'Bad Request: Should send array of objects for POST method' });
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
