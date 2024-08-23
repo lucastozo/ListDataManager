@@ -19,13 +19,12 @@
 
 const axios = require('axios');
 module.exports = async (req, res) => {
-    console.log(req.body + "\n");
     //res.setHeader('Access-Control-Allow-Origin', '*');
     //res.setHeader('Access-Control-Allow-Methods', 'POST');
     //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const { struct } = req.body || {};
-    //const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
+    const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
     /*
     if(apiKey !== process.env.REQUEST_API_KEY) {
@@ -43,21 +42,33 @@ module.exports = async (req, res) => {
     let level_requests_json;
     
     try {
-        const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
+        const { data: fileData } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+            headers: {
+                'Authorization': `token ${token}`
+            }
+        });
         const content = Buffer.from(response.data.content, 'base64').toString();
         level_requests_json = JSON.parse(content);
         if(!Array.isArray(level_requests_json)) level_requests_json = [];
 
-        console.log("JSON BEFORE PUSH: \n");
-        console.log(level_requests_json);
-
         level_requests_json.push(struct);
-        console.log("JSON AFTER PUSH: \n");
-        console.log(level_requests_json);
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
-        return res.status(200).json({ message: updatedContent });
+        const encodedContent = Buffer.from(updatedContent).toString('base64');
 
+        const commitMessage = `Add level request: ${struct.name_lvl}`;
+        await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+            message: commitMessage,
+            content: encodedContent,
+            sha: fileData.sha,
+            branch: 'main'
+        }, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        return res.status(200).json({ message: "Level request sent successfully" });
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
