@@ -35,7 +35,7 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'PUT');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    const { struct, dataMode } = req.body || {};
+    const { struct, dataMode } = req.body;
     const apiKey = req.headers['authorization']
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
-    var path;
+    let path;
     switch (dataMode) {
         case 'level':
             path = 'data/level-requests.json';
