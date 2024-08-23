@@ -18,42 +18,46 @@
 */
 
 const axios = require('axios');
-
 module.exports = async (req, res) => {
+    //res.setHeader('Access-Control-Allow-Origin', '*');
+    //res.setHeader('Access-Control-Allow-Methods', 'POST');
+    //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
     const { struct } = req.body || {};
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
+    /*
+    if(apiKey !== process.env.REQUEST_API_KEY) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+    */
+
     if (!struct) {
-        return res.status(400).json({ message: 'Bad Request: Missing struct' });
+        return res.status(400).json({ message: 'Bad Request: Missing struct or apiKey' });
     }
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
     const path = 'data/level-requests.json';
-
+    let level_requests_json;
+    
     try {
-        console.log("tentando o get");
         const { data: fileData } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
             headers: {
                 'Authorization': `token ${token}`
             }
         });
-        console.log("Resposta do get:", fileData);
-
-        console.log("SHA do arquivo:", fileData.sha);
-
-        const content = Buffer.from(fileData.content, 'base64').toString();
-        let level_requests_json = JSON.parse(content);
-        if (!Array.isArray(level_requests_json)) level_requests_json = [];
+        const content = Buffer.from(response.data.content, 'base64').toString();
+        level_requests_json = JSON.parse(content);
+        if(!Array.isArray(level_requests_json)) level_requests_json = [];
 
         level_requests_json.push(struct);
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
         const encodedContent = Buffer.from(updatedContent).toString('base64');
-        console.log("Conteúdo codificado em base64:", encodedContent);
 
         const commitMessage = `Add level request: ${struct.name_lvl}`;
-        const commitResponse = await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+        await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
             message: commitMessage,
             content: encodedContent,
             sha: fileData.sha,
@@ -64,13 +68,8 @@ module.exports = async (req, res) => {
                 'Content-Type': 'application/json'
             }
         });
-
-        console.log("Resposta do commit:", commitResponse.data);
-
         return res.status(200).json({ message: "Level request sent successfully" });
     } catch (error) {
-        //console.error("Erro ao processar a requisição:", error);
-        console.log("\n" + error)
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
-};
+}
