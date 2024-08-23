@@ -32,7 +32,6 @@ module.exports = async (req, res) => {
                 'Authorization': `token ${token}`
             }
         });
-        return res.status(200).json({ message: "Success" });
         const content = Buffer.from(response.data.content, 'base64').toString();
         level_requests_json = JSON.parse(content);
 
