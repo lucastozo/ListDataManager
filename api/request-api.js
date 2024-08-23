@@ -3,8 +3,9 @@
 
 // parameters:
 // - levelStruct or recordStruct, struct containing data
-// - dataMode, mode of data (1 for level, 2 for record)
-// - apiToken
+// - dataMode, string, 'level' or 'record'
+
+// authorization: apiKey in headers
 
 // struct for level request:
 /*
@@ -19,26 +20,31 @@
 
 const axios = require('axios');
 module.exports = async (req, res) => {
-    //res.setHeader('Access-Control-Allow-Origin', '*');
-    //res.setHeader('Access-Control-Allow-Methods', 'POST');
-    //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    const { struct } = req.body || {};
+    const { struct, dataMode } = req.body || {};
+    //const apiKey = req.headers['authorization']
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
-    /*
-    if(apiKey !== process.env.REQUEST_API_KEY) {
-        return res.status(403).json({ message: 'Unauthorized' });
-    }
-    */
-
-    if (!struct) {
-        return res.status(400).json({ message: 'Bad Request: Missing struct or apiKey' });
-    }
+    // if(apiKey !== process.env.REQUEST_API_KEY) return res.status(403).json({ message: 'Unauthorized' });
+    if (!struct || (dataMode !== 'level' && dataMode !== 'record'))
+        return res.status(400).json({ message: 'Bad Request: Missing struct or invalid dataMode' });
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
-    const path = 'data/level-requests.json';
+    let path;
+    switch (dataMode) {
+        case 'level':
+            path = 'data/level-requests.json';
+            break;
+        case 'record':
+            path = 'data/record-requests.json';
+            break;
+        default:
+            return res.status(400).json({ message: 'Invalid dataMode' });
+    }
     let level_requests_json;
     
     try {
@@ -68,7 +74,7 @@ module.exports = async (req, res) => {
                 'Content-Type': 'application/json'
             }
         });
-        return res.status(200).json({ message: "Level request sent successfully" });
+        return res.status(200).json({ message: 'Request sent successfully' });
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
