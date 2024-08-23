@@ -6,6 +6,17 @@
 // - dataMode, mode of data (1 for level, 2 for record)
 // - apiToken
 
+// struct for level request:
+/*
+{
+    "id_lvl": "level name",
+    "name_lvl": "level name",
+    "creator_lvl": "creator name",
+    "verifier_lvl": "verifier name",
+    "video_lvl": "video link",
+}
+*/
+
 const axios = require('axios');
 module.exports = async (req, res) => {
     console.log(req.body);
@@ -33,19 +44,17 @@ module.exports = async (req, res) => {
     
     try {
         const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
-        console.log("PASSOU NO GET DO GITHUB");
         const content = Buffer.from(response.data.content, 'base64').toString();
-        console.log("PASSOU NO BUFFER");
-        console.log(content);
         level_requests_json = JSON.parse(content);
-        console.log("PASSOU NO PARSE");
+        if(!Array.isArray(level_requests_json)) level_requests_json = [];
+
         console.log(level_requests_json);
 
         level_requests_json.push(struct);
         console.log("PASSOU NO PUSH");
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
-        return res.status(200).json({ message: "START \n" + updatedContent + "\nEND" });
+        return res.status(200).json({ message: updatedContent });
 
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error' });
