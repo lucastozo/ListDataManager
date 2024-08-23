@@ -46,12 +46,15 @@ module.exports = async (req, res) => {
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
     let path;
+    let commitMessage;
     switch (dataMode) {
         case 'level':
             path = 'data/level-requests.json';
+            commitMessage = `Add level request: ${struct.name_lvl} with ID: ${struct.id_lvl}`;
             break;
         case 'record':
             path = 'data/record-requests.json';
+            commitMessage = `Add record request: ${struct.player_name} on ${struct.name_lvl}`;
             break;
         default:
             return res.status(400).json({ message: 'Invalid dataMode' });
@@ -72,8 +75,7 @@ module.exports = async (req, res) => {
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
         const encodedContent = Buffer.from(updatedContent).toString('base64');
-
-        const commitMessage = `Add level request: ${struct.name_lvl}`;
+        
         await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
             message: commitMessage,
             content: encodedContent,
