@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const { struct } = req.body;
-    //const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
+    const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
 
     /*
     if(apiKey !== process.env.REQUEST_API_KEY) {
