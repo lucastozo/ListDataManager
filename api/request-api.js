@@ -33,11 +33,14 @@ module.exports = async (req, res) => {
     
     try {
         const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
-        return res.status(200).json({ message: 'OK' });
+        console.log("PASSOU NO GET DO GITHUB");
         const content = Buffer.from(response.data.content, 'base64').toString();
+        console.log("PASSOU NO BUFFER");
         level_requests_json = JSON.parse(content);
+        console.log("PASSOU NO PARSE");
 
         level_requests_json.push(struct);
+        console.log("PASSOU NO PUSH");
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
         return res.status(200).json({ message: "START \n" + updatedContent + "\nEND" });
