@@ -4,13 +4,13 @@
 // method: PUT or POST
 /*
     if called with PUT, the api will add an struct to the level-requests or record-requests file
-    if called with POST, the api will simply commit an given JSON object to the file
-    ps: this json will be handled correctly by the function that calls this api
+    if called with POST, the api will simply commit an given array of objects to the file
+    ps: this array of objects will be handled correctly by the function that calls this api
     ps2: reason for POST is to remove requests that are already analyzed
 */
 
 // parameters:
-// - levelobject or recordobject, object containing data; OR an JSON object containing the data to be commited
+// - levelobject or recordobject, object containing data; OR an array of objects containing the data to be commited
 // - dataMode, string, 'level' or 'record'
 
 // authorization: API_KEY in headers
@@ -52,6 +52,7 @@ module.exports = async (req, res) => {
     if (!object || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing object or invalid dataMode' });
 
+    /*
     const isJSON = (str) => {
         try {
             JSON.parse(str);
@@ -62,6 +63,17 @@ module.exports = async (req, res) => {
     };
     if (CALLING_METHOD === 'PUT' && isJSON(object)) return res.status(400).json({ message: 'Bad Request: Should not send JSON object for PUT method' });
     if (CALLING_METHOD === 'POST' && !isJSON(object)) return res.status(400).json({ message: 'Bad Request: Should send JSON object for POST method' });
+    */
+    const isArrayOfObjects = (arr) => {
+        if (!Array.isArray(arr)) return false;
+        for (let i = 0; i < arr.length; i++) {
+            if (typeof arr[i] !== 'object') return false;
+        }
+        return true;
+    };
+    const isGivenObjectAnArray = isArrayOfObjects(object);
+    if (CALLING_METHOD === 'PUT' && isGivenObjectAnArray) return res.status(400).json({ message: 'Bad Request: Should not send array of objects for PUT method' });
+    if (CALLING_METHOD === 'POST' && isGivenObjectAnArray) return res.status(400).json({ message: 'Bad Request: Should send array of objects for POST method' });
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
@@ -81,26 +93,23 @@ module.exports = async (req, res) => {
         default:
             return res.status(400).json({ message: 'Invalid dataMode' });
     }
-    let updatedContent;
     
     try {
-        let fileData;
-        if (CALLING_METHOD === 'PUT') { // Send request
-            const { data } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-                headers: {
-                    'Authorization': `token ${TOKEN}`
-                }
-            });
-            fileData = data;
+        let json = [];
+        const { data: fileData } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
+            headers: {
+                'Authorization': `token ${TOKEN}`
+            }
+        });
+        if (CALLING_METHOD === 'PUT') {
             const content = Buffer.from(fileData.content, 'base64').toString();
             let requests_json = JSON.parse(content);
             if(!Array.isArray(requests_json)) requests_json = [];
-
             requests_json.push(object);
-            updatedContent = JSON.stringify(requests_json, null, 2);
-        } else { // Send given JSON object
-            updatedContent = JSON.stringify(object, null, 2);
-        }
+            json = requests_json;
+        } else json = object;
+
+        const updatedContent = JSON.stringify(json, null, 2);
         const encodedContent = Buffer.from(updatedContent).toString('base64');
         
         await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
