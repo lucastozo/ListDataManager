@@ -5,5 +5,12 @@
     "creator_lvl": "creator name",
     "verifier_lvl": "verifier name",
     "video_lvl": "video link"
+  },
+  {
+    "id_lvl": "level",
+    "name_lvl": "level",
+    "creator_lvl": "creator",
+    "verifier_lvl": "verifier",
+    "video_lvl": "video"
   }
 ]
