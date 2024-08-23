@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
     
     try {
         const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
+        return res.status(200).json({ message: 'OK' });
         const content = Buffer.from(response.data.content, 'base64').toString();
         level_requests_json = JSON.parse(content);
 
