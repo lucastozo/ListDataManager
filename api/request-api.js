@@ -20,9 +20,9 @@
 
 const axios = require('axios');
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    //res.setHeader('Access-Control-Allow-Origin', '*');
+    //res.setHeader('Access-Control-Allow-Methods', 'POST');
+    //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const { struct, dataMode } = req.body || {};
     //const apiKey = req.headers['authorization']
@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
 
     const owner = 'lucastozo';
     const repo = 'ListDataManager';
-    let path;
+    var path;
     switch (dataMode) {
         case 'level':
             path = 'data/level-requests.json';
