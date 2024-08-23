@@ -55,6 +55,7 @@ module.exports = async (req, res) => {
 
         const updatedContent = JSON.stringify(level_requests_json, null, 2);
         const encodedContent = Buffer.from(updatedContent).toString('base64');
+        console.log("Passou pelo encodedContent");
 
         const commitMessage = `Add level request: ${struct.name_lvl}`;
         await axios.put(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
