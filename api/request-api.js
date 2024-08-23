@@ -32,11 +32,13 @@ module.exports = async (req, res) => {
     const path = 'data/level-requests.json';
 
     try {
+        console.log("tentando o get");
         const { data: fileData } = await axios.get(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
             headers: {
                 'Authorization': `token ${token}`
             }
         });
+        console.log("Resposta do get:", fileData);
 
         console.log("SHA do arquivo:", fileData.sha);
 
