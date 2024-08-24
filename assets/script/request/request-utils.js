@@ -52,7 +52,6 @@ function requestTableToObjectArray(table, dataMode) {
 }
 
 function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
-    return;
     // dataMode is a string that can be 'level' or 'record'
     // objectArray is an array of objects containing the data to be commited
     // authorization: API_KEY in headers
@@ -79,16 +78,16 @@ function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
     })
     .then(data => {
         errorMsgHandler("Alterações enviadas com sucesso!", 3);
-        sendButtonHandler(1);
+        disableSendButton(false);
     })
     .catch(error => {
         errorMsgHandler(error.message, 2);
-        sendButtonHandler(1);
+        disableSendButton(false);
     });
 }
 
 async function sendRequestChanges(dataMode) {
-    sendButtonHandler(2);
+    disableSendButton(true);
     const userKey = document.getElementById('pr-user-key').value;
     const tokenHash = document.getElementById('pr-token').value;
     const changelog = document.getElementById('pr-changelog').value;
@@ -99,4 +98,12 @@ async function sendRequestChanges(dataMode) {
     const objectArray = requestTableToObjectArray(table, dataMode);
 
     await fetchAPI(userKey, tokenHash, objectArray, dataMode);
+}
+
+function disableSendButton(disabled) {
+    const sendButton = document.querySelector('#send-changes-button');
+    console.log(sendButton);
+    sendButton.disabled = disabled;
+    if (disabled) sendButton.innerHTML = "<i class='fas fa-circle-notch fa-spin'></i> Enviando...";
+    else sendButton.innerHTML = "Enviar";
 }
