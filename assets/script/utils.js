@@ -10,3 +10,14 @@ async function getListSettingsValues() {
         return null;
     }
 }
+
+async function getLevelRequests() {
+    try {
+        const response = await fetch('/data/level-requests.json');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
