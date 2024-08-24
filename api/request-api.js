@@ -70,6 +70,10 @@ module.exports = async (req, res) => {
     const TOKEN = process.env.DLBR_AUTO_GITHUB_TOKEN;
     
     if (CALLING_METHOD === 'POST') {
+        const adminData = process.env.USERS_KEYS;
+        const adminDataSplit = adminData.split(',');
+        const hash = process.env.DLBR_AUTO_HASH_TOKEN;
+
         const { userKey, tokenHash } = req.body;
         let userName;
         for (let i = 0; i < adminDataSplit.length; i++) {
