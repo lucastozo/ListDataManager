@@ -10,10 +10,10 @@
 */
 
 // parameters:
+// - userKey, string
+// - tokenHash, string
 // - levelobject or recordobject, object containing data; OR an array of objects containing the data to be commited
 // - dataMode, string, 'level' or 'record'
-
-// authorization: API_KEY in headers
 
 // object for level request:
 /*

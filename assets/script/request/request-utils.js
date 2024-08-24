@@ -55,23 +55,27 @@ function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
     // dataMode is a string that can be 'level' or 'record'
     // objectArray is an array of objects containing the data to be commited
     // authorization: API_KEY in headers
-    
-    const URL = "/api/request-api";
 
-    axios({
+    fetch('/api/request-api', {
         method: 'POST',
-        url: URL,
-        data: {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
             userKey: userKey,
             tokenHash: tokenHash,
             object: objectArray,
             dataMode: dataMode
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+                return response.json().then(errorData => {
+                throw new Error(errorData.message);
+            });
         }
-    }).then(response => {
-        console.log(response.data);
-    }).catch(error => {
-        console.error(error);
-    });
+        return response.json();
+    })
 }
 
 async function sendRequestChanges(dataMode) {
