@@ -55,16 +55,12 @@ function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
     // dataMode is a string that can be 'level' or 'record'
     // objectArray is an array of objects containing the data to be commited
     // authorization: API_KEY in headers
-
-    const API_KEY = process.env.REQUEST_API_KEY;
+    
     const URL = "/api/request-api";
 
     axios({
         method: 'POST',
         url: URL,
-        headers: {
-            'Authorization': API_KEY
-        },
         data: {
             userKey: userKey,
             tokenHash: tokenHash,
