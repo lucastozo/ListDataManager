@@ -25,27 +25,9 @@ async function IniciarPlayerData()
     const data = await response.json();
     const decodedContent = atob(data.content);
     const jsonContent = JSON.parse(decodedContent);
-
-    await getNameLevelFromId(jsonContent);
+    
     BotoesManipuladoresRecord();
     GeneratePlayerTable(jsonContent);
-}
-
-async function getNameLevelFromId(jsonPlayerData) {
-    const response = await fetch('https://api.github.com/repos/lucastozo/DemonlistBR/contents/data/leveldata.json');
-    const data = await response.json();
-    const decodedContent = atob(data.content);
-    const jsonLevelData = JSON.parse(decodedContent);
-
-    jsonPlayerData.Data.forEach(function(item) {
-        const level = jsonLevelData.Data.find(function(element) {
-            if (element.id_lvl === item.id_lvl) {
-                // gerar um atributo name_lvl no jsonPlayerData para cada item e preencher com o nome do level
-                item.name_lvl = element.name_lvl;
-                return element;
-            }
-        });
-    });
 }
 
 function GeneratePlayerTable(json) {
