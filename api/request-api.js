@@ -64,11 +64,21 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const CALLING_METHOD = req.method;
-    const { object, dataMode } = req.body;
-    const API_KEY = req.headers['authorization']
+    const { userKey, tokenHash, object, dataMode } = req.body;
     const TOKEN = process.env.DLBR_AUTO_GITHUB_TOKEN;
-
-    if (!API_KEY || (API_KEY !== process.env.REQUEST_API_KEY)) return res.status(403).json({ message: 'Unauthorized' });
+    /*
+    let userName;
+    for (let i = 0; i < adminDataSplit.length; i++) {
+        if (adminDataSplit[i] === userKey) {
+            userName = adminDataSplit[i].split('@')[0];
+            break;
+        }
+    }
+    if (!userName || tokenHash !== hash) {
+        res.status(403).json({ message: 'Acesso negado. Chave de usuário ou token inválidos' });
+        return;
+    }
+    */
     if (!object || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing object or invalid dataMode' });
     

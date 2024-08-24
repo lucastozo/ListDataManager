@@ -51,13 +51,13 @@ function requestTableToObjectArray(table, dataMode) {
     return objectArray;
 }
 
-function fetchAPI(objectArray, dataMode) {
+function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
     // dataMode is a string that can be 'level' or 'record'
     // objectArray is an array of objects containing the data to be commited
     // authorization: API_KEY in headers
 
     const API_KEY = process.env.REQUEST_API_KEY;
-    const URL = "https://https://listdatamanager.vercel.app/api/request-api";
+    const URL = "/api/request-api";
 
     axios({
         method: 'POST',
@@ -66,6 +66,8 @@ function fetchAPI(objectArray, dataMode) {
             'Authorization': API_KEY
         },
         data: {
+            userKey: userKey,
+            tokenHash: tokenHash,
             object: objectArray,
             dataMode: dataMode
         }
@@ -87,7 +89,8 @@ async function sendRequestChanges(dataMode) {
     let table = document.getElementById('level-request-table');
     if (dataMode === 'record') table = document.getElementById('record-request-table');
     const objectArray = requestTableToObjectArray(table, dataMode);
-    const response = await fetchAPI(objectArray, dataMode);
+
+    const response = await fetchAPI(userKey, tokenHash, objectArray, dataMode);
     if(response.status === 200) errorMsgHandler("Alterações enviadas com sucesso!", 3);
     else errorMsgHandler("Erro ao enviar as alterações!", 1);
     sendButtonHandler(1);
