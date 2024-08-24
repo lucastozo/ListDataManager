@@ -32,8 +32,33 @@
             <a href="pages/ignoredNames.html" class="btn btn-outline-light index-button">
                 <i class="fa-solid fa-user-minus fa-2xl"></i> <br>Nomes Ignorados
             </a>
+            <button type="button" class="btn btn-outline-light index-button" data-bs-toggle="modal" data-bs-target="#request-select-modal">
+                <i class="fa-solid fa-user-plus fa-2xl"></i> <br>Envios
+            </button>
         </div>
     </section>
+
+    <div id="request-select-modal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Envios</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <a href="pages/request/level-request.html" class="btn btn-outline-light index-button">
+                        <i class="fa-solid fa-gear fa-2xl"></i> <br>Levels
+                    </a>
+                    <a href="pages/request/record-request.html" class="btn btn-outline-light index-button">
+                        <i class="fa-regular fa-circle-play fa-2xl"></i> <br>Records
+                    </a>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- loading overlay -->
     <div id="overlay" class="position-fixed justify-content-center align-items-center" style="display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0,0,0,0.5); z-index: 9999;">
