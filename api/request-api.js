@@ -64,19 +64,21 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     const CALLING_METHOD = req.method;
-    const { userKey, tokenHash, object, dataMode } = req.body;
+    const { object, dataMode } = req.body;
     const TOKEN = process.env.DLBR_AUTO_GITHUB_TOKEN;
     
-    let userName;
-    for (let i = 0; i < adminDataSplit.length; i++) {
-        if (adminDataSplit[i] === userKey) {
-            userName = adminDataSplit[i].split('@')[0];
-            break;
+    if (CALLING_METHOD === 'POST') {
+        const { userKey, tokenHash } = req.body;
+        let userName;
+        for (let i = 0; i < adminDataSplit.length; i++) {
+            if (adminDataSplit[i] === userKey) {
+                userName = adminDataSplit[i].split('@')[0];
+                break;
+            }
         }
-    }
-    if (!userName || tokenHash !== hash) {
-        res.status(403).json({ message: 'Acesso negado. Chave de usuário ou token inválidos' });
-        return;
+        if (!userName || tokenHash !== hash) {
+            return res.status(403).json({ message: 'Acesso negado. Chave de usuário ou token inválidos' });
+        }
     }
     
     if (!object || (dataMode !== 'level' && dataMode !== 'record'))
