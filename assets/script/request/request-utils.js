@@ -78,24 +78,24 @@ function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
     })
     .then(data => {
         errorMsgHandler("Alterações enviadas com sucesso!", 3);
+        sendButtonHandler(1);
     })
     .catch(error => {
         errorMsgHandler(error.message, 2);
+        sendButtonHandler(1);
     });
 }
 
 async function sendRequestChanges(dataMode) {
+    sendButtonHandler(2);
     const userKey = document.getElementById('pr-user-key').value;
     const tokenHash = document.getElementById('pr-token').value;
     const changelog = document.getElementById('pr-changelog').value;
     if (!checkInputs(userKey, tokenHash, changelog)) return;
-    sendButtonHandler(2);
-
 
     let table = document.getElementById('level-request-table');
     if (dataMode === 'record') table = document.getElementById('record-request-table');
     const objectArray = requestTableToObjectArray(table, dataMode);
 
     await fetchAPI(userKey, tokenHash, objectArray, dataMode);
-    sendButtonHandler(1);
 }
