@@ -76,6 +76,12 @@ function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
         }
         return response.json();
     })
+    .then(data => {
+        errorMsgHandler("Alterações enviadas com sucesso!", 3);
+    })
+    .catch(error => {
+        errorMsgHandler(error.message, 2);
+    });
 }
 
 async function sendRequestChanges(dataMode) {
@@ -90,8 +96,6 @@ async function sendRequestChanges(dataMode) {
     if (dataMode === 'record') table = document.getElementById('record-request-table');
     const objectArray = requestTableToObjectArray(table, dataMode);
 
-    const response = await fetchAPI(userKey, tokenHash, objectArray, dataMode);
-    if(response.status === 200) errorMsgHandler("Alterações enviadas com sucesso!", 3);
-    else errorMsgHandler("Erro ao enviar as alterações!", 1);
+    await fetchAPI(userKey, tokenHash, objectArray, dataMode);
     sendButtonHandler(1);
 }
