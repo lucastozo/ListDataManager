@@ -52,6 +52,7 @@ function requestTableToObjectArray(table, dataMode) {
 }
 
 function fetchAPI(userKey, tokenHash, objectArray, dataMode) {
+    return;
     // dataMode is a string that can be 'level' or 'record'
     // objectArray is an array of objects containing the data to be commited
     // authorization: API_KEY in headers
