@@ -21,3 +21,14 @@ async function getLevelRequests() {
         return null;
     }
 }
+
+async function getRecordRequests() {
+    try {
+        const response = await fetch('/data/record-requests.json');
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}

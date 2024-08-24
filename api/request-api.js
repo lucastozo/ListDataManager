@@ -66,7 +66,7 @@ module.exports = async (req, res) => {
     const CALLING_METHOD = req.method;
     const { userKey, tokenHash, object, dataMode } = req.body;
     const TOKEN = process.env.DLBR_AUTO_GITHUB_TOKEN;
-    /*
+    
     let userName;
     for (let i = 0; i < adminDataSplit.length; i++) {
         if (adminDataSplit[i] === userKey) {
@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
         res.status(403).json({ message: 'Acesso negado. Chave de usuário ou token inválidos' });
         return;
     }
-    */
+    
     if (!object || (dataMode !== 'level' && dataMode !== 'record'))
         return res.status(400).json({ message: 'Bad Request: Missing object or invalid dataMode' });
     

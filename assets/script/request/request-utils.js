@@ -102,7 +102,6 @@ async function sendRequestChanges(dataMode) {
 
 function disableSendButton(disabled) {
     const sendButton = document.querySelector('#send-changes-button');
-    console.log(sendButton);
     sendButton.disabled = disabled;
     if (disabled) sendButton.innerHTML = "<i class='fas fa-circle-notch fa-spin'></i> Enviando...";
     else sendButton.innerHTML = "Enviar";
