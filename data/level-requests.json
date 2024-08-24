@@ -5,12 +5,5 @@
     "creator_lvl": "maxfs",
     "verifier_lvl": "ultrakawaHD",
     "video_lvl": "https://www.youtube.com/watch?v=a_Bqa8l9Xtc"
-  },
-  {
-    "id_lvl": "level id",
-    "name_lvl": "level name",
-    "creator_lvl": "creator name",
-    "verifier_lvl": "verifier name",
-    "video_lvl": "video link"
   }
 ]
