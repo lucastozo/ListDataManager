@@ -23,6 +23,36 @@
         </section>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#send-changes-modal"><i class="fa-solid fa-upload"></i> Enviar mudanças</button>
 
+        <div class="dropdown" id="sort-dropdown" style="margin-top: 10px;">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Ordenar por
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Mais novo primeiro</a></li>
+              <li><a class="dropdown-item" href="#">Mais antigo primeiro</a></li>
+            </ul>
+        </div>
+        <script>
+            const dropdownItems = document.querySelectorAll('#sort-dropdown .dropdown-item');
+            let lastSelectedItemText = '';
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    const selectedItemText = event.target.textContent;
+                    if (selectedItemText === lastSelectedItemText) return;
+                    lastSelectedItemText = selectedItemText;
+                    let newerFirst = false;
+                    if (selectedItemText === 'Mais novo primeiro') newerFirst = true;
+                    else if (selectedItemText === 'Mais antigo primeiro') newerFirst = false;
+                    clearTable();
+                    assignRequests(newerFirst);
+                });
+            });
+            function clearTable() {
+                const table = document.querySelector('#record-request-table tbody');
+                table.innerHTML = '';
+            }
+        </script>
+
         <table id="record-request-table" class="table table-dark table-striped table-hover">
             <thead>
                 <tr>

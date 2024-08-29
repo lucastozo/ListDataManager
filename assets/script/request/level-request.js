@@ -1,7 +1,9 @@
 assignRequests();
-async function assignRequests() {
+async function assignRequests(newestFirst = false) {
     const requests = await getLevelRequests();
-    if (requests.length != 0) insertRequests(requests);
+    if (requests.length === 0) return;
+    if (newestFirst) requests.reverse();
+    insertRequests(requests);
 }
 
 function insertRequests(array) {
