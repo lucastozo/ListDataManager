@@ -32,3 +32,13 @@ async function getRecordRequests() {
         return null;
     }
 }
+
+async function getQuantityPendingRequests(dataMode) {
+    // dataMode is a string that can be 'level' or 'record'
+    // function to check if there are pending requests, used to enable a notification in index page
+    let url;
+    dataMode === 'level' ? url = '/data/level-requests.json' : url = '/data/record-requests.json';
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.length;
+}

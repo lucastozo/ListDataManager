@@ -33,7 +33,7 @@
                 <i class="fa-solid fa-user-minus fa-2xl"></i> <br>Nomes Ignorados
             </a>
             <button type="button" class="btn btn-outline-light index-button" data-bs-toggle="modal" data-bs-target="#request-select-modal">
-                <i class="fa-solid fa-user-plus fa-2xl"></i> <br>Envios
+                <i class="fa-solid fa-user-plus fa-2xl"></i> <br><p id="request-tip" style="margin-bottom: 0;">Envios</p>
             </button>
         </div>
     </section>
@@ -47,10 +47,10 @@
                 </div>
                 <div class="modal-body text-center">
                     <a href="pages/request/level-request.html" class="btn btn-outline-light index-button">
-                        <i class="fa-solid fa-gear fa-2xl"></i> <br>Levels
+                        <i class="fa-solid fa-gear fa-2xl"></i> <br><p id="level-request-tip" style="margin-bottom: 0;">Levels</p>
                     </a>
                     <a href="pages/request/record-request.html" class="btn btn-outline-light index-button">
-                        <i class="fa-regular fa-circle-play fa-2xl"></i> <br>Records
+                        <i class="fa-regular fa-circle-play fa-2xl"></i> <br><p id="record-request-tip" style="margin-bottom: 0;">Records</p>
                     </a>
                 </div>
                 <div class="modal-footer">
@@ -59,6 +59,25 @@
             </div>
         </div>
     </div>
+
+    <script src="assets/script/utils.js"></script>
+    <script>
+        changeRequestsTip();
+
+        async function changeRequestsTip() {
+            let qtLevelRequests = await getQuantityPendingRequests('level');
+            let qtRecordRequests = await getQuantityPendingRequests('record');
+            const requestTip = document.getElementById('request-tip');
+            let quantity = qtLevelRequests + qtRecordRequests;
+            if (quantity > 0) requestTip.textContent = `Envios 🔔 (${quantity})`;
+
+            const levelRequestTip = document.getElementById('level-request-tip');
+            if (qtLevelRequests > 0) levelRequestTip.textContent = `Levels 🔔 (${qtLevelRequests})`;
+
+            const recordRequestTip = document.getElementById('record-request-tip');
+            if (qtRecordRequests > 0) recordRequestTip.textContent = `Records 🔔 (${qtRecordRequests})`;
+        }
+    </script>
 
     <!-- loading overlay -->
     <div id="overlay" class="position-fixed justify-content-center align-items-center" style="display: none; width: 100%; height: 100%; top: 0; left: 0; background-color: rgba(0,0,0,0.5); z-index: 9999;">
