@@ -2,7 +2,7 @@ let mainListMaxPosition, extendedListMaxPosition;
 
 let ogTable;
 
-document.getElementById('overlay').style.display = 'flex';
+showOrHideLoadingOverlay(true);
 checkOpenPR(1).then(isOpen => {
     if(isOpen) {
         var confirmMessage = 'ATENÇÂO: Existem alterações pendentes na lista. Os dados atuais podem estar desatualizados.\n' +
@@ -30,7 +30,7 @@ async function IniciarLevelData() {
     BotoesManipuladoresLevel();
     await GenerateLevelTable(jsonContent);
     updateTable();
-    document.getElementById('overlay').style.display = 'none';
+    showOrHideLoadingOverlay(false);
 
     ogTable = JSON.parse(JSON.stringify(jsonContent)); // use because of showDiffBetweenOldAndUpdatedTable()
 }
@@ -435,7 +435,7 @@ async function RefreshAll()
         return;
     }
     var table = document.querySelector('#level-table');
-    document.getElementById('overlay').style.display = 'flex';
+    showOrHideLoadingOverlay(true);
 
     var nameMap = {};
     for(var i = 1; i < table.rows.length; i++)
@@ -490,7 +490,7 @@ async function RefreshAll()
             }
         }
     }
-    document.getElementById('overlay').style.display = 'none';
+    showOrHideLoadingOverlay(false);
 }
 
 function createDeleteButton(table, tr) {

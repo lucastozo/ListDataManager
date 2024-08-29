@@ -42,3 +42,8 @@ async function getQuantityPendingRequests(dataMode) {
     const data = await response.json();
     return data.length;
 }
+
+function showOrHideLoadingOverlay(show) {
+    const overlay = document.getElementById('overlay');
+    show ? overlay.style.display = 'flex' : overlay.style.display = 'none';
+}

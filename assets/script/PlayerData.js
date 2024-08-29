@@ -1,6 +1,6 @@
 let mainListMaxPosition, extendedListMaxPosition;
 
-document.getElementById('overlay').style.display = 'flex';
+showOrHideLoadingOverlay(true);
 checkOpenPR(2).then(isOpen => {
     if(isOpen) {
         var confirmMessage = 'ATENÇÂO: Existem alterações pendentes na lista. Os dados atuais podem estar desatualizados.\n' +
@@ -137,7 +137,7 @@ function GeneratePlayerTable(json) {
         }
     }
     getPlayers();
-    document.getElementById('overlay').style.display = 'none';
+    showOrHideLoadingOverlay(false);
 }
 
 function DeletarLinhaPlayerTable(tr) {

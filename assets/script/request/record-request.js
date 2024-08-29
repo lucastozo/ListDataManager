@@ -1,12 +1,17 @@
 assignRequests();
 async function assignRequests(newestFirst = false) {
+    showOrHideLoadingOverlay(true);
     const requests = await getRecordRequests();
-    if (requests.length === 0) return;
+    if (requests.length === 0) {
+        showOrHideLoadingOverlay(false);
+        return;
+    }
     if (newestFirst) requests.reverse();
-    insertRequests(requests);
+    await insertRequests(requests);
+    showOrHideLoadingOverlay(false);
 }
 
-function insertRequests(array) {
+async function insertRequests(array) {
     const table = document.getElementById('record-request-table');
     const tbody = table.querySelector('tbody');
     array.forEach(request => {
