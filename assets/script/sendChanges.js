@@ -84,7 +84,7 @@ function sendRecordsChanges()
             }
             json.Data.push(record);
         }
-        return json.sort((a, b) => a.name_lvl.localeCompare(b.name_lvl));
+        return json.Data.sort((a, b) => a.name_lvl.localeCompare(b.name_lvl));
     }
 
     const json = ExportarRecord(document.getElementById('player-table'));
