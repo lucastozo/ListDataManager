@@ -210,13 +210,12 @@ function errorMsgHandler(msg, mode)
     }
 }
 
-function parseYoutubeLink(url)
-{
-    function extractYoutubeVideoID(url)
-    {
-        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+function parseYoutubeLink(url) {
+    function extractYoutubeVideoID(url) {
+        var regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/\?.*v=))([\w-]{11})/;
         var match = url.match(regExp);
-        return (match&&match[7].length==11)? match[7] : false;
+        return (match && match[1].length == 11) ? match[1] : false;
     }
-    return "https://youtu.be/" + extractYoutubeVideoID(url);
+    var videoID = extractYoutubeVideoID(url);
+    return videoID ? "https://youtu.be/" + videoID : false;
 }
