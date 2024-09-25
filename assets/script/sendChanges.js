@@ -27,7 +27,7 @@ function sendLevelChanges()
             level.name_lvl = table.rows[i].cells[2].textContent;
             level.creator_lvl = table.rows[i].cells[3].textContent;
             level.verifier_lvl = table.rows[i].cells[4].textContent;
-            level.video_lvl = table.rows[i].cells[5].textContent;
+            level.video_lvl = parseYoutubeLink(table.rows[i].cells[5].textContent);
             var publisher = table.rows[i].cells[6].textContent;
             if(publisher && publisher.trim() !== '')
             {
@@ -77,7 +77,7 @@ function sendRecordsChanges()
             record.name_lvl = table.rows[i].cells[1].textContent;
             record.player_name = table.rows[i].cells[2].textContent;
             record.progress = parseInt(table.rows[i].cells[3].textContent);
-            var video = table.rows[i].cells[4].textContent;
+            var video = parseYoutubeLink(table.rows[i].cells[4].textContent);
             if(video && video.trim() !== '')
             {
                 record.video = video;
@@ -208,4 +208,15 @@ function errorMsgHandler(msg, mode)
             break; 
 
     }
+}
+
+function parseYoutubeLink(url)
+{
+    function extractYoutubeVideoID(url)
+    {
+        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+        var match = url.match(regExp);
+        return (match&&match[7].length==11)? match[7] : false;
+    }
+    return "https://youtu.be/" + extractYoutubeVideoID(url);
 }
