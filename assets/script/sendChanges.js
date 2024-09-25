@@ -212,6 +212,10 @@ function errorMsgHandler(msg, mode)
 }
 
 function parseYoutubeLink(url) {
+    // se não for link do youtube retorna a url inalterada
+    var isYoutubeLink = url.includes('youtube') || url.includes('youtu.be');
+    if (!isYoutubeLink) return url;
+    
     function extractYoutubeVideoID(url) {
         var regExp = /(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/\?.*v=))([\w-]{11})/;
         var match = url.match(regExp);
