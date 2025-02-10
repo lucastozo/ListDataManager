@@ -1,4 +1,5 @@
 const axios = require('axios');
+const crypto = require('crypto');
 module.exports = async (req, res) => 
 {
     const { userKey, tokenHash, changelog, changes, dataMode } = req.body;
@@ -12,7 +13,7 @@ module.exports = async (req, res) =>
 
     const adminData = process.env.USERS_KEYS;
     const token = process.env.DLBR_AUTO_GITHUB_TOKEN;
-    const hash = process.env.DLBR_AUTO_HASH_TOKEN;
+    const hash = crypto.createHash('sha256').update(token).digest('hex');
 
     const adminDataSplit = adminData.split(',');
 
